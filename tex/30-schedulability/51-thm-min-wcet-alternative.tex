@@ -1,0 +1,72 @@
+\begin{theorem}[Minimal Sum of WCET for \Partial{i} by Threads Per
+  Job] For a task \task{i} divided into \Partial{i} by TPJ for a
+  non-preemptive chunk of size ${q}$, where ${c_i(m)}$'s growth
+  is non-increasing, ${\sum_{\task{k} \in \Partial{i}} c_k(m_k)}$ is
+  minimal. 
+  
+  \begin{proof} 
+
+    For simplicity, assume ${\left\lceil \frac{m_i}{m}
+     \right\rceil = \frac{m_i}{m}}$. Threads Per Job will divide
+   \task{i} into ${\frac{m_i}{m}}$ partial tasks \Partial{i} with ${m}$
+   threads released per job. Note, any task
+   ${\task{k} \in \Partial{i}}$ assigned ${m_k > m}$ is  
+   infeasible in this non-preemptive context because
+   ${c_k(m_k) > q}$. As such, only divisions where tasks are assigned
+   ${m}$ or fewer threads per job need to be considered. Additionally,
+   all partial tasks share the same WCET, ie. for a task
+   ${\task{k} \in \Partial{i}, c_k(m) = c_i(m)}$.
+
+   Assume the division of \task{i} into \Partial{i} is performed
+   arbitrarily under two restrictions 1.) no task has
+   more than ${m}$ threads assigned to it
+   ${\forall \task{k} \in \Partial{i}~|~ m_k \le m}$ 2.) at least one
+   task has less than ${m}$ threads ${\exists \task{x} \in
+     \Partial{i}~|~ m_x < m}$.
+
+   The division process conserves threads, all ${m_i}$
+   threads of \task{i} are assigned to partial tasks in \Partial{i},
+   ${m_i = \sum_{\task{k} \in \Partial{i}} m_k}$. Select \task{x} as
+   the task with the greatest number of threads less than ${m}$,
+   ${\task{x} = \{ \forall \task{x},\task{k} \in \Partial{i} \land m_x
+     < m~|~ m_x \ge m_k\}}$. There must exist a task ${\task{y} \in
+     \Partial{i}}$ where ${0 < m_y \le m_x < m}$.
+
+   Consider a modification of \Partial{i} to ${\Partial{i}^{'}}$, where the
+   number of threads assigned to ${\task{y} \in \Partial{i}^{'}}$ is
+   reduced by one and the number of threads assigned to
+   ${\task{x} \in \Partial{i}^{'}}$ is increased by one:
+   ${m_y = m_y - 1}$, ${m_x = m_x + 1}$. Name the difference of
+   WCET times of \task{y} and \task{x} from \Partial{i} to
+   ${\Partial{i}^{'}}$, ${\Delta_y = c_i(m_y) - c_i(m_y - 1)}$ and
+   ${\Delta_x = c_i(m_x + 1) - c_i(m_x)}$. Since ${c_i(m)}$ is
+   strictly increasing both ${\Delta_x}$ and ${\Delta_y}$ are positive. 
+
+   The sum of WCET of ${\Partial{i}^{'}}$ can be written as the sum of
+   WCET from \Partial{i} including change in execution of subtracting
+   one thread of \task{y} and adding one thread of \task{x}:
+   \begin{equation*}
+     \indent
+     \sum_{\task{k} \in \Partial{i}^{'}} c_k(m_k) =
+     \Delta_x - \Delta_y + \sum_{\task{k} \in \Partial{i}} c_k(m_k) 
+   \end{equation*} 
+
+   It can be shown that ${\Delta_x \le \Delta_y}$ and that
+   ${\sum_{\task{k} \in \Partial{i}^{'}} c_k(m_k)}$ must be less than
+   or equal to ${\sum_{\task{k} \in \Partial{i}} c_k(m_k)}$.
+   Since ${m_x > m_y}$, the desired inequality can be found by
+   repeatedly applying Property~\ref{prop:wcet-growth}:
+   \begin{equation*}
+     \indent
+     \begin{split}
+       \Delta_x =
+       c_i(m_x + 1) - c_i(m_x) &\le c_i(m_x) - c_i(m_x - 1) \\
+       &\le c_i(m_x - 1) - c_i(m_x - 2) \\
+       &... \\
+       &\le c(m_y) - c(m_y - 1)
+       &= \Delta_y
+     \end{split}
+   \end{equation*}
+  \end{proof}
+\end{theorem}
+

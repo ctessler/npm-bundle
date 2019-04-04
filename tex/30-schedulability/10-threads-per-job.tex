@@ -1,0 +1,181 @@
+\subsection{Threads per Job (\tpj{}) Scheduling Algorithm}
+\label{sec:tpj}
+
+In this work, the \npchunks{} algorithm is modified for several
+purposes. First, the unnecessary pessimism is removed from chunk
+calculations. Second, the schedulability test is adapted to the model
+used herein. Lastly, when a given assignment of tasks and threads are
+infeasible, tasks are divided (when possible) to fit into their
+chunks. The division process is repeated until the task set is
+feasible, or no possible divisions remain and the task set is reported
+as infeasible. The algorithm is named the \emph{Threads Per Job} (\tpj{})
+scheduling algorithm.
+
+A full description of \tpj{} is presented at the end of this
+subsection. To reach the complete description, an intermediate
+algorithm named \emph{Bigger Non-Preemptive Chunks} (\bng{}) is presented
+as pseudocode in Algorithm~\ref{alg:bng}. \bng{} removes the
+pessimism described in Section~\ref{sec:improve-np-chunk}. The
+algorithm takes advantage of a property of the demand function 
+\dbf{\tasks{}}{$t$} noted in~\cite{Baruah:2005}. 
+
+\begin{prop}[Demand Change]\label{prop:dmnd}
+Demand for a task does not change for values of ${t}$ that do not
+equal an absolute deadline. In terms of the set of ordered absolute
+deadlines,
+${\dbf{\tasks{}}{\Deadline{i-1}} =
+  \dbf{\tasks{}}{\Deadline{i}${ - \epsilon}$}}$, for
+${0 < \epsilon \le (\Deadline{i} - \Deadline{i-1})}$.
+\end{prop}
+\input{\tex{20-bng.tex}}
+
+Line~\ref{line:bng-improvement} of Algorithm~\ref{alg:bng} implements
+the improvement of \bng{} over \npchunks{}. The non-preemptive chunk 
+${q_j}$ of task \task{j} is taken from the slack of the previous
+interval ${D_{k-1}}$ or the task's WCET ${c_j(m_j)}$, whichever is
+smaller. The algorithm verifies the condition set by
+Equation~\ref{eq:baruah-07}, selecting the correct interval
+length by Property~\ref{prop:dmnd}, which precludes the inclusion of
+\task{j}'s execution requirement in the interval (and other tasks with
+deadline \Deadline{k}).
+
+\input{30-schedulability/30-tpj.tex}
+
+The Threads per Job scheduling Algorithm~\ref{alg:tpj}, is a
+modification of \bng{} from limited-preemption EDF (EDF-LP) scheduling to
+non-preemptive EDF (EDF-NP). Input to the schedulability test is a task set
+specification \tasks{}, if \tpj{} returns a \emph{feasibile} result
+there exists a posterior task set which can be scheduled by
+non-preemptive EDF and the posterior task set is
+returned as \tasks{}. An \emph{infeasible} result indicates that
+\tpj{} could not guarantee \tasks{} would be schedulable by EDF-NP for
+any posterior task set. Since non-preemptive EDF is not optimal with
+respect to feasibility~\cite{Buttazzo:2011}, \tpj{} is a sufficient
+test but cannot be necessary.
+
+Algorithm~\ref{alg:tpj} (\tpj{}) modifies \bng{}, the modifications
+are limited to
+Lines~\ref{line:bnc-mod-start}-\ref{line:bnc-mod-end}. An additional
+benefit of \bng{} removing the pessimism of each ${q_j}$, is
+that each ${q_j}$ can be calculated without consideration of the
+current task \task{j} and the demand at ${D_k}$. Chunk values depend
+on the demand of ${D_{k-1}}$ instead. This permits an
+efficient implementation of \tpj{} by moving the slack calculation of
+the current interval to the end of each iteration. Otherwise, if slack
+were calculated earlier in each iteration, the changes to demand
+resulting from Lines~\ref{line:bnc-mod-start}-\ref{line:bnc-mod-end}
+would force the demand and slack of ${D_k}$ to be recalculated.
+
+The first notable change to \bng{} is introduced on
+Line~\ref{line:minq-start}, comparing the available slack to the WCET
+of a single thread of \ant{j}. If there is insufficient slack to
+execute just one thread of \ant{j} to completion, the task cannot be
+executed non-preemptively for any number of threads and the task set
+is infeasible non-preemptively.
+
+Lines~\ref{line:rem-p1}-\ref{line:rem-p2} introduce several
+subtle changes. For clarity, it is simpler to discuss
+the negative case (${\slack{\Deadline{k-1}} \ge \hat{c}_j(\hat{m}_j)}$)
+before the positive.
+When there is sufficient slack for ${\hat{m}_j}$ threads to execute
+without preemption, \ant{j} is given its full WCET
+(${\hat{c}_j(\hat{m}_j)}$) as its non-preemptive chunk. In other
+words, no division of \ant{j} is required and the posterior task set
+\tasks{} is unchanged (with respect to \ant{j}).
+Lines~\ref{line:rem-p1}-\ref{line:rem-p2} are avoided, the
+algorithm progresses to the next task such that ${d_i = D_k}$.
+
+However, in the positive case on Line~\ref{line:rem-p1} (when
+${\slack{\Deadline{k-1}} < \hat{c}_j(\hat{m}_j)}$), ${\hat{m}_j}$
+threads of \ant{j} cannot feasibly execute without being
+preempted. Therefore, \ant{j} must be divided. The \texdivide{}
+procedure creates a partial task \Partial{j} set of \ant{j}, such that
+all tasks ${\task{p} \in \Partial{j}}$ will complete within the
+available slack ${c_p(m_p) \le D_{k-1}}$. The posterior task set \tasks{}
+has \ant{j} removed, and is replaced by the partial set \Partial{j}
+maintaining the specified number of threads for \ant{j}.
+
+For any task \ant{j}, the task is transformed into a partial task set
+\Partial{j} and assigned a non-preemptive chunk only
+once in the iteration where the absolute deadline \Deadline{k} is
+equal to the relative deadline of the task:
+${\Deadline{k} = \hat{\deadline{j}}}$. Since tasks of \tasks{} are
+evaluated in strictly increasing absolute deadline order, the impact
+on demand and non-preemptive chunk sizes of processing \ant{j}
+exclusively impacts demand for larger intervals ${D_\ell > D_k}$ and
+non-preemptive chunk sizes for tasks ${\task{\ell} \in \tasks{}}$ with
+greater relative deadlines ${\deadline{\ell} > \hat{\deadline{}}_k}$.
+
+\begin{prop}[Divisions of \ant{j} Exclusively Impacts Interval of
+    Length ${t \ge \hat{\deadline{}}_j}$]
+\label{prop:divisions}
+Division of \ant{j} into the partial set \Partial{j}, and replacing
+\ant{j} in \tasks{} with \Partial{j} will impact demand exclusively
+for intervals of length ${\Deadline{k} \ge \hat{d}_j}$, 
+slack of absolute deadlines ${\Deadline{k} > \hat{d}_j}$ and therefore
+non-preemptive chunk values ${q_\ell}$ for tasks ${\task{\ell} \in
+  \tasks{}}$ with relative deadlines ${\deadline{\ell} \ge \Deadline{k}}$
+
+By definition of \dbf{\ant{j}}{$t$}, no task of \Partial{j} or \ant{j}
+can impact the task set \tasks{} demand \dbf{\tasks{}}{$t$} when
+${t < d_j}$. Thus replacing \ant{j} in \tasks{}, only affects the
+demand of intervals with length ${\hat{d}_j}$ or greater. Slack
+over the interval ${D_k}$ is calculated from exclusively shorter
+intervals. Since the demand of the current interval ${D_k}$ does not
+influence the slack at ${D_k}$, replacing \ant{j} in \tasks{} only
+affects the slack of intervals with length greater than
+${D_k}$. Non-preemptive chunk sizes are assigned based on the
+available slack, and only those assigned for an interval of length
+greater than ${D_k}$ can be affected by replacing \ant{j} in \tasks{}. 
+\end{prop}
+
+\begin{algorithm}[ht]
+  \caption{\text{\sc{divide}}}
+  \label{alg:divide}
+  \begin{algorithmic}[1]
+    \Procedure{divide}{\ant{j}, ${q}$}
+        \State ${\Partial{j} \gets \{\}}$
+        \State ${m \gets \underset{m \in \mathbb{Z}^+}\argmax
+          \left(\hat{c}_i(m) \le q \right)}$
+        \label{line:m-max}
+        \State ${r \gets \hat{m}_j}$
+        \While {${r > 0}$}
+            \State ${m_p \gets \min(r, m)}$
+            \State ${\task{p} \gets (\hat{p}_j, \hat{d}_j, m_p,
+              \hat{c}_j)}$
+            \Comment Posterior task, same period, deadline, WCET function.
+            \State ${\Partial{j} \gets \Partial{j} \cup \task{p}}$
+            \State ${r \gets r - m_p}$
+        \EndWhile
+      \State return \Partial{j}
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+
+On Line~\ref{line:divide} of the \tpj{} Algorithm~\ref{alg:tpj}, the task
+\ant{j} is divided into \Partial{j} by the \text{\sc{divide}}
+procedure. Pseudocode of \text{\sc{divide}} is given by
+Algorithm~\ref{alg:divide}. The number of tasks in \Partial{j} are
+determined by the maximum number of threads ${m}$ of \ant{j} that can
+execute non-preemptively within ${q}$ time units. Each task ${\task{k}
+  \in \Partial{j}}$ is assigned ${m}$ threads of \ant{j} or however
+many remain, whichever is less. The result is that each task set
+has the following properties. 
+
+\begin{prop}[Partial Task Sets Returned from \texdivide{}]
+  \label{prop:partial-task-set-size} The partial task set \Partial{j}
+  of an anterior task \ants{} for a specific ${q}$ value (and related
+  maximum threads assigned per job ${m}$ such that ${c_j(m) \le
+    q}$) contains posterior tasks where:
+  \begin{enumerate}
+    \item The exact number of posterior tasks is ${|\Partial{j}| = \lceil
+      \frac{\hat{m}_j}{m} \rceil}$ 
+    \item Exactly ${\lfloor \frac{\hat{m}_j}{m} \rfloor}$ tasks of
+      \Partial{j} are assigned ${m}$ threads per job.
+    \item There is at most one task ${\task{g} \in \Partial{j}}$ with
+      exactly ${m_g = \hat{m}_j \mod m}$ threads.
+  \end{enumerate}
+  
+\end{prop}
+  
+

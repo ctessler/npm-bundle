@@ -1,0 +1,169 @@
+\section{Evaluation}\label{sec:eval}
+\renewcommand{\tex}[1]{70-evaluation/#1}
+
+Evaluation of \tpj{} and the non-preemptive multi-threaded task model
+presented in this work focuses on the schedulability ratio of
+synthetic task sets. The ratio of task set specifications deemed
+schedulable by \tpj{} for EDF-NP will be compared to \npchunks{} in
+both limited and fully preemptive settings for EDF. What follows is a 
+description of the parameters to task set specification generation,
+the prescribed evaluation metrics, and analysis of the results.
+
+\subsection{Generating Task Sets}
+
+A specified task set \tasks{} is generated with four parameters,
+${M}$ the total number of threads of execution, ${U}$ the target
+utilization, a maximum growth factor \GFactor{}, and ${m}$ the maximum
+number of threads per task. The number of threads ${M}$ may be one of
+${\{3, 5, 7, 10, 25, 50, 100\}}$ with dependent ${m}$ values of
+${\{2, 2, 3, 4, 8, 16, 32\}}$. Utilization varies from [0.1, 0.9]
+and the growth factor varies from [0.1, 0.9] independently by
+increments of 0.1. 
+
+Each task ${\task{i} \in \tasks{}}$ is assigned ${m_i}$ threads from
+a random uniform integer distribution over ${[1, m]}$, such that the
+sum of all threads is equal to ${M = \sum_{\task{i} \in \tasks{}}
+  m_i}$. A task's period \period{i} is from a uniform integer
+distribution over [10, 1000]. Utilization ${u_i}$ of each task
+\task{i} is calculated using the ${\text{UUniFast}(n,
+  U)}$~\cite{Bini:2004} algorithm, where ${n = |\tasks{}|}$.
+
+\input{\tex{10-alternate-parameters.tex}}
+
+A task's WCET is assigned for ${m_i}$ threads,
+${c_i(m_i) = \lceil p_i \cdot U_i \rceil}$. Tasks
+are given a growth factor ${\GFactor{}_i}$ in a uniform real
+distribution over ${[0.1, \GFactor{}]}$.  The remaining ${m_i - 1}$
+WCET values are determined by substituting ${\GFactor{}_i}$ into
+Equation~\ref{eq:gfactor-eval}. The relative deadline of \task{i},
+\deadline{i} is taken from a uniform integer distribution over
+${[\max(c_i(m_i),p_i/2), 1000]}$.
+
+For each combination of ${(M, m, U, \GFactor{})}$, 1000 task sets
+specifications are generated. Figure~\ref{fig:gen-params} summarizes
+the parameters of task set generation. The smaller values of ${M}$ are taken
+from~\cite{Bertogna:2010} and the dependent ${m}$ values were selected
+to avoid one task consuming more than half of the threads in the
+task set specification (where possible). 
+
+% \input{\tex{10-specification-parameters.tex}}
+
+\subsubsection{Synthetic Tasks and Applicability of Parameters}
+
+Synthetic task sets are the basis for the evaluation out of
+necessity. Currently, we are unaware of any hard real-time
+multi-threaded task sets that have been accepted as representative of
+real-world applications suitable for research. While such a task set
+would be a benefit, it would also likely require similar extrapolation
+techniques to match the more than 500,000 task sets considered herein.
+
+To avoid favoring \tpj{}, the task set generation parameters ${m}$ and
+\GFactor{} were carefully selected. For the threads per task ${m}$, a
+large ${m}$ favors \tpj{}. Therefore, no single task my be
+assigned more than half the total threads: ${m \le \lfloor \frac{M}{2}
+\rfloor}$ (except for ${M = 3}$). 
+
+The growth factor \GFactor{} is informed by previous results for
+\bundlep{}~\cite{Tessler:2018b}. In~\cite{Tessler:2018b},
+multi-threaded tasks are constructed from the M{\"a}lardalen WCET
+benchmarks~\cite{Gustafsson:2010}. The analysis
+in~\cite{Tessler:2018b} produces growth factors below 0.1 for
+\texttt{ud}, \texttt{nsichneu}, and others. Smaller \GFactor{} values
+benefit \tpj{}, setting the lower bound of \GFactor{} to 0.1 restricts
+\tpj{}'s performance below observations.
+
+\subsection{Evaluation Metrics}
+
+\tpj{} is compared with the \npchunks{} schedulability test in
+non-preemptive (EDF-NP) and preemptive (EDF-P) settings. The focus of
+the evaluation is on the non-preemptive setting. The preemptive
+setting serves as a comparison against the theoretical best case. For EDF-P,
+preemptions incur \textbf{no} penalty, CRPD or otherwise. In this
+highly advantageous setting for EDF-P, \tpj{} produces
+feasible task sets \npchunks{} deems infeasible in a
+preemptive setting.
+
+To compare schedulability tests, each task set specification \ants{}
+is provided to \tpj{} without modification under EDF-NP
+scheduling. \tpj{} will transform the task set producing a
+posterior task set \tasks{} if a feasible one exists. A task set
+specification \ants{} cannot be provided directly to \npchunks{},
+since \npchunks{} has no concept of threads per job. 
+
+To be suitable for analysis by \npchunks{}, a task set specification
+\ants{} is transformed into two posterior task sets. The first task
+set, ${\tasks{}^1}$ represents single-threaded tasks by including all
+threads of \ants{} as individual tasks. The second task set,
+${\tasks{}^m}$ represents the tasks of \ants{} as indivisible,
+executing all specified threads without preemption per job. Each task
+in ${\tasks{}^m}$ benefits from the  thread-level scheduler but does
+not expose the threaded nature of the task to the scheduling
+algorithm. This is achieved by modifying an anterior task \ant{j} with
+${\hat{m}_j > 1}$ and ${\hat{c}_j(\hat{m}_j)}$ to a posterior task
+\task{j} with ${m_j = 1}$ and ${c_j(1) = \hat{c}_j(\hat{m}_j)}$. 
+
+The \npchunks{} schedulability test will produce results for
+${\tasks{}^1}$ and ${\tasks{}^m}$ in both preemptive and
+non-preemptive settings. For non-preemptive schedulability analysis,
+each task ${\task{i} \in \tasks{}^1}$ or ${\tasks{}^m}$ must have a
+non-preemptive chunk size ${q_i \ge c_i(m_i)}$. When evaluating
+preemptive EDF schedulability for ${\tasks{}^1}$ and ${\tasks{}^m}$,
+the results are labeled EDF-P:1 and EDF-P:M respectively. When
+evaluating non-preemptive EDF schedulability, the results are labeled
+EDF-NP:1 and EDF-NP:M. Schedulability results for \tpj{} under EDF-NP
+scheduling are labeled EDF-TPJ. Table~\ref{table:combinations} gives a
+synopsis of the schedulability tests. Schedulability ratios for each
+of the combinations are calculated for every ${(M, m, U, \GFactor{})}$ 
+configuration.
+
+\begin{wraptable}{l}{.6\linewidth}
+  \center
+  \begin{tabular}{|c|c|l|l|}
+    \hline
+    \textbf{Test} & \textbf{Task Set} & \textbf{EDF-NP} & \textbf{EDF-P} \\
+    \hline
+    \hline
+    \tpj{} & \ants{} & EDF-TPJ & - \\
+    \hline
+    \multirow{2}{*}{\npchunks{}}
+    & ${\tasks{}^1}$ & EDF-NP:1 & EDF-P:1 \\
+    & ${\tasks{}^m}$ & EDF-NP:M & EDF-P:M \\
+    \hline
+  \end{tabular}
+  \caption{Schedulability Test Combinations}
+  \label{table:combinations}
+\end{wraptable}
+
+It must be noted that EDF-P:M is an unrealistic schedulability
+test. It serves only as a theoretical limit to the benefits of concave
+growth. Concave growth is a result of scheduling threads of the same
+job without preemption by another job with a \texttt{BUNDLE}-based
+thread-level scheduler.  However, current \texttt{BUNDLE}
+implementations require that an executing task cannot be
+preempted by a different task.  Such a preemption would destroy the
+cache benefits and analysis of \texttt{BUNDLE} scheduling. EDF-P:M
+performs analysis assuming preemptions between jobs are allowed and
+have zero cost. It is included as a reference for \tpj{}'s
+performance, as a ceiling for what is theoretically possible given
+ideal (but likely impossible) conditions.
+
+As a consequence of transforming multi-threaded task set
+specifications \ants{} to single-threaded task sets ${\tasks{}^1}$,
+some single threaded task sets may not be feasible. One reason for a
+task set ${\tasks{}^1}$ to become infeasible is the 
+utilization exceeding one, while ${\tasks{}^m}$ and \ants{} have
+utilization less than one. In this setting, EDF-TPJ
+is capable of scheduling task sets that preemptive EDF cannot.
+
+For a task set specification configuration ${(M, m, U, \GFactor{})}$,
+call ${S}$ the set of all task set specifications \ants{} generated
+for the configuration. Call ${s}$ the set of ${\tasks{}^1}$
+transformed from ${\ants{} \in S}$ such that ${\tasks{}^1}$ are
+infeasible for EDF-P:1 due to the utilization of ${\tasks{}^1}$
+exceeding one. The set \stpj{} is the subset of ${s}$ deemed feasible
+by the \tpj{} schedulability test. That is, \stpj{} is the set of all
+tasks \tpj{} could schedule, but EDF-P:1 could not -- even considering
+EDF-P:1 does not account for CRPD overhead that
+EDF-P:1 would incur in a real system implementation. 
+
+\input{\tex{30-results.tex}}

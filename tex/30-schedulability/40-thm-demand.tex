@@ -1,0 +1,110 @@
+\begin{theorem}[Minimal Demand of Partial Task Sets Over All Intervals]
+  \label{thm:all-demand}
+  For a partial task set \Partial{i} of an anterior task \task{i} with
+  ${m_i}$ threads, minimizing ${\sum_{\task{k} \in \Phi_i}
+    \dbf{\task{k}}{\deadline{i}}}$ minimizes ${\sum_{\task{k} \in
+      \Phi_i} \dbf{\task{k}}{${t}$}}$ for all ${t \ge 0}$.
+\begin{proof}
+  Provided into two parts, when ${t < \deadline{i}}$ and
+  ${t \ge \deadline{i}}$. The first portion is a simple direct
+  argument. The second portion is by contradiction.
+
+  \emph{Part 1}: When ${t < \deadline{i}}$,
+  ${0 = \sum_{\task{k} \in \Phi_i}\dbf{\task{k}}{$t$}}$. By definition
+  of the demand bound function (Equation~\ref{eq:dbf}) the execution
+  requirement of a task is zero before the first possible
+  deadline. All tasks ${\task{k} \in \Partial{i}}$ share the same
+  relative deadlines ${d_k = d_i}$ and absolute deadlines because
+  ${p_k = p_i}$. These follow from the definition of
+  division (Definition~\ref{def:restrict-division}) and partial tasks
+  (Definition~\ref{def:partial-tasks}). Since ${t < \deadline{i}}$, ${\dbf{\task{k}}{$t$} = 0}$ for all ${\task{k} \in
+    \Partial{i}}$. Therefore, ${\sum_{\task{k} \in \Phi_i}
+    \dbf{\task{k}}{${t}$}}$ will be minimal (exactly zero) when ${t <
+    d_i}$, regardless of ${\sum_{\task{k} \in \Phi_i}
+    \dbf{\task{k}}{\deadline{i}}}$.
+
+  \emph{Part 2}: When ${t \ge \deadline{i}}$, assume
+  ${\sum_{\task{k} \in \Partial{i}} \dbf{\task{k}}{\deadline{i}}}$ is 
+  minimal and ${\sum_{\task{k} \in \Partial{i}} \dbf{\task{k}}{${t}$}}$ is
+  not minimal. Since all partial tasks ${\task{k} \in \Partial{i}}$ share
+  absolute deadlines (as described in Part 1), demand for each task
+  \dbf{\task{k}}{$t$} increases only for values of ${t}$ that equal
+  absolute deadlines. Furthermore, the execution requirement of
+  every \task{k} increases exactly by ${c_k(m_k)}$ for each absolute
+  deadline of ${\task{i} = \{ \Deadline{1}, \Deadline{2},
+    ... \}}$:
+  \begin{equation*}
+    \indent
+    \begin{split}
+      \dbf{\task{k}}{\Deadline{1}} &= 1 \cdot c_k(m_k) \\
+      \dbf{\task{k}}{\Deadline{2}} &= 2 \cdot c_k(m_k) \\
+      ... \\
+      \dbf{\task{k}}{\Deadline{z}} &= z \cdot c_k(m_k)
+    \end{split}
+  \end{equation*}
+
+  Utilizing Property~\ref{prop:dmnd}, for ${t \ge d_i}$ and
+  \Deadline{z}, where \Deadline{z} is the greatest absolute deadline
+  of \task{i} less than or equal to ${t}$ (${\Deadline{z} \le t}$): 
+
+  \begin{equation*}
+    \indent
+    \begin{split}
+    \sum_{\task{k} \in \Partial{i}} \dbf{\task{k}}{${t}$} &=
+      \sum_{\task{k} \in \Partial{i}} z \cdot
+      \dbf{\task{k}}{\deadline{i}} 
+      & = z \cdot \sum_{\task{k} \in \Partial{i}} \dbf{\task{k}}{\deadline{i}}
+    \end{split}
+  \end{equation*}
+
+  Because ${z}$ depends on ${t}$ (and is completely independent of the
+  division of the partial task set), if ${\sum_{\task{k} \in \Partial{i}}
+    \dbf{\task{k}}{$t$}}$ were not minimal then
+  ${\sum_{\task{k} \in \Partial{i}} \dbf{\task{k}}{\deadline{i}}}$ could not
+  be minimal, contradicting the assumption.
+
+  Combining Parts 1 and 2, when the demand for the partial tasks of
+  \task{i} is minimized for the interval ${d_i}$, the demand of
+  partial tasks of \task{i} is minimized for all intervals of 
+  length ${t \ge 0}$.  
+  
+\end{proof}
+\end{theorem}
+
+\begin{corollary}[Minimal WCET Sum of \Partial{i} Minimizes Demand
+    Over the Interval \deadline{i}]
+  \label{corollary:min-demand-di}
+  The demand of \Partial{i} over the interval \deadline{i} is
+  minimized when the sum of WCET of \Partial{i} is minimized.
+\begin{proof} Following directly from
+  Theorem~\ref{thm:all-demand}, where the demand over the interval
+  \deadline{i} of each task ${\task{k} \in \Partial{i}}$ is given by
+  ${\dbf{\task{k}}{\deadline{i}} = 1 \cdot c_k(m_k) =
+    c_k(m_k)}$. Then,
+
+  \begin{equation*}
+    \indent
+    \begin{split}
+      \sum_{\task{k} \in \Partial{i}} \dbf{\task{k}}{\deadline{i}} &=
+        \sum_{\task{k} \in \Partial{i}} c_k(m_k)
+    \end{split}
+  \end{equation*}
+
+  Thus, minimizing ${\sum_{\task{k} \in \Partial{i}} c_k(m_k)}$
+  minimizes ${\sum_{\task{k} \in \Partial{i}}
+  \dbf{\task{k}}{\deadline{i}}}$
+\end{proof}
+
+\end{corollary}
+
+\begin{corollary}[Minimal WCET Sum of \Partial{i} Minimizes Demand
+    Over all Intervals ${t \ge 0}$]
+  \label{corollary:min-wcet-di}
+  The demand of \Partial{i} over alls interval ${t \ge 0}$ is
+  minimized when the sum of WCET of \Partial{i} is minimized.
+\begin{proof} Following directly from
+  Theorem~\ref{thm:all-demand} and Corollary~\ref{corollary:min-demand-di}.
+\end{proof}
+
+\end{corollary}
+

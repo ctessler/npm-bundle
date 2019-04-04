@@ -1,0 +1,25 @@
+#
+# base.tp -- the base of the configuration for task set generation
+#
+
+# Version, required
+tp-version		= 1.0;
+
+#
+# These parameters are dynamic
+#                               # total-threads and max-tpj are tied
+total-threads 		= 3;	# {3, 5, 7, 10, 25, 50, 100} 
+max-tpj			= 2;    # {2  2, 3,  4,  8, 16,  32}
+			  	# independent
+utilization		= .1;	# [.1, .9] by .1
+max-factor		= .9;   # [.1, .9] by .1
+
+#
+# These parameters are static
+#
+min-tpj 		= 1;	# Minimum number of threads per job of any task
+min-period		= 10;   # Minimum period of any task
+max-period		= 1000; # Maximum period of any task
+min-deadline		= 10;	# Minimum relative deadline of any task
+max-deadline		= 1000; # Maximum relative deadline of any task
+min-factor		= .1;	# Minimum growth factor

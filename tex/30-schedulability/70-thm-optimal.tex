@@ -1,0 +1,22 @@
+In the non-preemptive context and schedulability test given by Threads
+Per Job, the \emph{optimal} division of a task into a partial task set
+is the division which maximizes the number of feasible task sets. 
+
+\begin{theorem}[TPJ is Optimal]
+  For task set \tasks{} where all tasks ${\task{i} \in \tasks{}}$
+  have non-increasing growth, TPJ divides tasks optimally. 
+
+  \begin{proof} By Theorem~\ref{thm:tpj-min-demand}, TPJ produces the
+    minimal demand over any interval for all tasks according to the
+    non-preemptive assigned. Infeasibility is tested on
+    Lines~\ref{line:infeasible-1} and \ref{line:infeasible-2} of
+    Algorithm~\ref{alg:tpj}.
+
+    Both infeasibility tests examine the available slack. If there is
+    too little slack, the task set is infeasible. Since slack is
+    dependent upon demand, producing the minimal demand maximizes the
+    available slack. TPJ minimizes demand over any interval,
+    maximizing slack in any interval. This maximizes the number of
+    feasible task sets, therefor TPJ is optimal.%
+  \end{proof}
+\end{theorem}

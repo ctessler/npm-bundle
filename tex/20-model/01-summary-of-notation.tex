@@ -1,0 +1,38 @@
+\subsection{Summary of Notation}
+\begin{table}[H]
+  \center
+  \begin{tabular}{|c|l|}
+    \hline
+    \textbf{Symbol} & \textbf{Meaning} \\
+    \hline
+    \BRT & Block reload time \\
+    \hline
+    \CPI & Cycles per instruction \\
+    \hline
+    \tasks & Task set ${\tasks = \{ \task{0}, \task{1}, ..., \task{n-1}\}}$ \\
+    \hline
+    ${\task{i} = (\period{i}, \deadline{i}, \taskthreads{i}, c_i:\mathbb{N} \mapsto \mathbb{R}^+)}$
+    & Task ${i}$ \\
+    \hline
+    \period{i} & Minimum inter-arrival time of \task{i} \\
+    \hline
+    \deadline{i} & Relative deadline of \task{i} \\
+    \hline
+    \Deadline{i} & Absolute deadline with index ${i}$ \\
+    \hline
+    \wcet{i}{m} & WCETO for ${m}$ threads of \task{i} \\
+    \hline
+    \taskthreads{i} & Threads per job of task ${i}$ \\
+    \hline
+    \object{i} & Object executed by threads of \task{i} \\
+    \hline
+    \hp{} & Hyper period \\
+    \hline
+    \ants{} & Anterior Task Set \\
+    \hline
+    \ant{i} & Anterior Task ${i}$ \\
+    \hline
+    \Partial{i} & Partial Task set of \task{i} \\
+    \hline
+  \end{tabular}
+\end{table}

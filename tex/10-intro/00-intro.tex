@@ -1,0 +1,75 @@
+\section{Introduction}
+
+Hard real-time multi-threaded task systems which incorporate cache
+memory, must account for the variation in execution time and cache
+related preemption delays found in single-threaded task systems. For
+multi-threaded task systems, the complexity of cache interactions is
+increased due to thread-level cache interference and preemptions.
+Worst-case execution time (WCET) and schedulability analysis of hard
+real-time multi-threaded tasks commonly treat threads
+independently~\cite{Pellizzoni:2011} or utilize cache management
+techniques~\cite{Ward:2013} to limit the cache interference. 
+
+Analysis techniques focusing on independent treatment or
+limiting of cache interference exclude the possible benefit of
+caches. Multi-threaded tasks may benefit from caches. By virtue of
+sharing the same address space one thread of a task may cache values
+on behalf of another reducing the total execution time to complete
+both. This positive effect is referred to as the
+\emph{inter-thread cache benefit}~\cite{Tessler:2016}. 
+
+Currently, only the \bundle{}~\cite{Tessler:2016} and
+\bundlep{}~\cite{Tessler:2018} analysis techniques and cache
+congnizant thread-level scheduling algorithms incorporate the
+inter-thread cache benefit into WCET and schedulability
+analysis. These \texttt{BUNDLE}-based approaches are currently limited
+to a \underline{single} multi-threaded task. The primary focus of this
+work is to provide a scheduling algorithm and schedulability test for
+multi-threaded task sets with multiple tasks, where individual jobs
+utilize \texttt{BUNDLE}-based scheduling. As the first scheduling
+algorithm to incorporate \texttt{BUNDLE}-based thread-level
+scheduling, a non-preemptive algorithm was chosen to avoid necessary
+modifications to \bundle{} and \bundlep{}. Non-preemptive EDF was
+selected as the task-level scheduler, as the proposed schedulability
+test presented in Section~\ref{sec:schedulability} is based upon
+Baruah's limited-preemption for EDF~\cite{Baruah:2005} algorithm. 
+
+An additional consideration is made for alternative approaches and
+the unforeseen benefits to schedulability of thread-level schedulers
+of non-preemptive multi-threaded jobs. If the WCET of jobs can be
+expressed as a strictly increasing discrete concave function of the
+number of threads per job, the schedulability test developed for this
+work applies without modification to the \texttt{BUNDLE}-based
+approaches or non-preemptive EDF scheduling. 
+
+In the following sections, the key contributions are:
+\begin{enumerate}
+  \item A model of hard real-time multi-threaded tasks which is
+    compatible with existing single-threaded models, where tasks sets
+    may be transformed through division of threads.
+  \item A schedulability test named Threads Per Job (\tpj{}) that provides a
+    schedulability result and transformed feasible task set if the
+    specified task set could not be scheduled non-preemptively.
+  \item Proof of \tpj{}'s optimality with respect to non-preemptive
+    multi-threaded feasibility.
+  \item An improvement to Baruah's~\cite{Baruah:2005}
+    non-preemptive chunk algorithm, increasing chunk sizes.
+  \item An evaluation of over 500,000 task sets, comparing the
+    schedulability ratio of \tpj{} to those of non-preemptive and
+    (limited) preemptive EDF, with an accompanying implementation available for
+    download.
+\end{enumerate}
+
+These contributions are presented following the related
+research of Section~\ref{sec:related}. Section~\ref{sec:model}
+introduces the proposed model, application of non-preemptive EDF
+scheduling for thread-level schedulers, and the requirements of task
+transformation. Section~\ref{sec:schedulability} introduces then
+improves upon the non-preemptive chunk algorithm~\cite{Baruah:2005},
+followed by the \tpj{} schedulability algorithm and proof of
+feasibility. Section~\ref{sec:eval} compares the schedulability ratio
+of \tpj{} to other non-preemptive and preemptive scheduling
+algorithms, before concluding with Section~\ref{sec:conclusion}. 
+
+  
+

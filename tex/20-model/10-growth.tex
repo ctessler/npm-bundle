@@ -1,0 +1,92 @@
+\subsection{Worst-Case Execution Time Function Growth}
+\label{sec:discrete-growth}
+
+Motivation for the task model and schedulability analysis process
+proposed in this work stems from the inter-thread cache benefit of
+\texttt{BUNDLE}-based scheduling~\cite{Tessler:2016,
+  Tessler:2018}. The previous works~\cite{Tessler:2016, Tessler:2018}
+are limited to a single task; this work extends the method
+(non-preemptively) to multiple tasks. Schedulability analysis for
+\texttt{BUNDLE}-based scheduling algorithms produce, for each task
+\task{i}, a worst-case execution time combined with cache overhead
+(WCETO) function ${c_i(m)}$ in terms of ${m}$ the number of threads
+per job scheduled in a cache-cognizant manner. For tasks that benefit
+from \texttt{BUNDLE}-based scheduling and analysis, ${c_i(m)}$ is a
+strictly increasing discrete concave function. Tasks that do not are
+made vacuously concave by restricting jobs to release one thread.
+
+In the WCETO analysis of \bundle{} and \bundlep{}, threads are
+assigned to paths through the conflict-free region graph of the
+executable object which maximize their contribution to
+${c_i(m_i)}$ . When considering the addition of a thread ${m_i + 1}$,
+only the greatest increase in ${c_i(m_i)}$ is permitted. Subsequently,
+the addition of thread ${m_i + 2}$ must increase ${c_i(m_i)}$ by less
+than or equal to the increase from ${m_i + 1}$ or the increase of
+${m_i + 1}$ would not have been maximal. Therefore, for any ${m_a <
+  m_b < m_c}$ the point ${(m_b, c_i(m_b))}$ lies above the straight line
+described by ${(m_a, c_i(m_a))}$ and ${(m_c, c_i(m_c))}$ --
+subsequently, ${c_i(m_i)}$ is concave.
+
+A consequence of ${c_i(m)}$'s strictly increasing discrete
+concavity is a limit on the increase of the WCET as the number of
+threads increases. This property is referred to as the
+\emph{concave restricted growth} (\emph{concave growth} for brevity) of
+${c_i(m)}$ and is leveraged in Sections~\ref{sec:schedulability} and
+\ref{sec:eval}. 
+
+\begin{prop}[Concavity Restriction on WCET Growth]
+  \label{prop:ni-growth}
+  For a strictly increasing discrete
+  concave WCET function ${c_i(m)}$:
+  \label{prop:wcet-growth}
+  \begin{equation}
+    \label{eq:wcet-growth}
+    \indent
+    \forall m \in \mathbb{N}^+~|~c_i(m) - c_i(m - 1) \ge c_i(m + 1) - c_i(m)
+  \end{equation}
+  It then follows for ${m_x \ge m_y > 0}$
+  \begin{align*}
+    \indent
+    c_i(m_x + 1) - c_i(m_x) &\le c_i(m_x) - c_i(m_x - 1) \\
+    &\le c_i(m_x - 1) - c_i(m_x - 2) \\
+    &... \\
+    &\le c_i(m_y) - c_i(m_y + 1) \\
+    &\le c_i(m_y) - c_i(m_y - 1)
+  \end{align*}
+\end{prop}
+
+
+A WCET function ${c_i(m)}$ that obeys Property~\ref{prop:wcet-growth},
+will produce a value for ${c_i(m+1)}$ threads which is greater than
+${c_i(m)}$. The difference between ${c_i(m+1)}$ and ${c_i(m)}$ must be less
+than or equal to the difference of ${c_i(m)}$ and ${c_i(m-1)}$. As the
+number of threads increase, ${c_i(m)}$ increases at a decreasing (or
+stable) rate. 
+
+For the purposes of comparison and evaluation in
+Section~\ref{sec:eval}, an upper bound on the growth of ${c_i(m)}$
+is called the \emph{growth factor} ${\GFactor_i{}}$ of \task{i}. 
+Growth factors relate the WCET of one thread ${c_i(1)}$ to 
+the WCET of an arbitrary number of threads ${c_i(m)}$ for ${m > 0}$.
+A growth factor ${\GFactor_i{} \in (0,1]}$, for a task \task{i}, is a
+real number that satisfies Equation~\ref{eq:gfactor-condition}.  
+
+\begin{definition}[Growth Factor for \task{i}]
+  \begin{equation}
+    \label{eq:gfactor-condition}
+    \forall{m}~|~ c_i(m) \le c_i(1) + (m - 1) \cdot \GFactor{} \cdot c_i(1)
+  \end{equation}
+\end{definition}
+
+For an \GFactor{} satisfying Equation~\ref{eq:gfactor-condition}, the
+pessimistic upper bound provides a linear function that can be
+rearranged to find an upper bound on the WCET of one thread in terms
+of ${m}$ threads. 
+The result is Equation~\ref{eq:gfactor-eval}, which will be
+used in the evaluation Section~\ref{sec:eval} when constructing
+task sets. Note, since ${m \in \mathbb{N}}$ each increase of ${m}$ 
+increases ${c_i(m)}$ by ${\GFactor{} \cdot c_i(1)}$.
+\begin{equation}
+  \label{eq:gfactor-eval}
+  c_i(m) = c_i(1) + (m - 1) \cdot \GFactor{} \cdot c_i(1)
+\end{equation}
