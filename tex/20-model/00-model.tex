@@ -23,12 +23,15 @@ of \task{i} is a function of the number of threads per job,
 
 Thread-level scheduling algorithms must be characterized by a WCET
 function ${c_i(m_i)}$ for ${m_i}$ threads per job and ${c_i(m_i)}$ must be
-strictly increasing discrete concave (detailed in Subsection~\ref{sec:discrete-growth}). Thread-level schedulers that
+strictly increasing discrete and concave (detailed in
+Subsection~\ref{sec:discrete-growth}). Thread-level schedulers that
 produce concave ${c_i(m_i)}$ functions establish a relationship
 between the execution requirements of a task and the number of
 threads, where the requirement for one job of ${m_i}$ threads is less
-than ${m_i}$ jobs of one thread. It is this relationship which the
-scheduling behavior and analysis exploit. 
+than ${m_i}$ jobs of one thread. For \texttt{BUNDLE}-based schedulers,
+concavity is the result of the inter-thread cache benefit, where
+${c_i(m_i) < c_i(m_i + 1) < c_i(m_i) + c_i(1)}$; It is this
+relationship the scheduling behavior and analysis exploit. 
 
 Not all tasks and thread-level schedulers will produce concave WCET
 functions. Those tasks may be included without detriment to
