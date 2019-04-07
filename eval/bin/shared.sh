@@ -33,6 +33,26 @@ function gname {
 }
 
 #
+# Descriptive name for CASE STUDY task sets
+#
+# Usage
+#	name=$(csname $utilization $number)
+#
+function csname {
+	local u=$1
+	local n=$2
+
+	if [ -n "$n" ] ; then
+		printf "CSU%.1f-%04d" "$u" "$n"
+		return 0
+	fi
+	printf "CSU%.1f" "$u"
+	
+}
+
+
+
+#
 # Schedulability analysis names
 #
 sched_names=("LP-1 LP-M TPJ-i NP-1 NP-m")

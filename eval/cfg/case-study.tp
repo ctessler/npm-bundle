@@ -1,0 +1,19 @@
+#
+# case-study.tp -- base template file for the task set generation
+# parameters for case study taken from the BUNDLEP evaluation.
+#
+
+# Version, required
+tp-version		= 1.0;
+
+# These parameters are dynamic (adjusted on the command line)
+utilization		= .1;	# [.1, .9] by .1
+
+#
+# These parameters are static
+#
+min-period		= 10;   # Minimum period of any task
+max-period		= 1000; # Maximum period of any task
+total-threads		= 100;	# Only 100 threads 
+min-tpj			= 2; 	# No task may have fewer than 2 threads
+max-tpj			= 8;	# No task may have more than 8 threads
