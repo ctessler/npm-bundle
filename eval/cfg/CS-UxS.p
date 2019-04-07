@@ -24,10 +24,10 @@ set yrange [-.05:1.05]
 
 set ylabel "Schedulability Ratio" rotate parallel
 set xlabel "Utilization"
-set key outside
+# set key outside
 set output "cs-ratio.tex"
 
-set title "BUNDLEP Case Study, BRT:100 CPI:1 Cache Lines:32"
+# set title "BUNDLEP Case Study, BRT:100 CPI:1 Cache Lines:32"
  
 plot \
 "../../data/cs-ratio-data/cs-ratio.data" using 1:2 title "EDF-P:1" with linespoints, \

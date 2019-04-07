@@ -7,7 +7,7 @@ TEX=$(wilcdard *.tex)
 PDFS=$(TOP)
 VER=$(shell git rev-parse --short HEAD)
 TMP=aux
-PDFLATEX=pdflatex -shell-escape -output-format=pdf -interaction=nonstopmode -output-directory=$(TMP)
+PDFLATEX=pdflatex -halt-on-error -shell-escape -output-format=pdf -interaction=nonstopmode -output-directory=$(TMP)
 
 define PLOTERROR
 A plot directory is required.

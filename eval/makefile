@@ -1,6 +1,5 @@
 # COUNT is the number of tasks per configuration
 COUNT=1000
-COUNT=10
 
 runargs=-M "3, 5, 7, 10, 25, 50, 100" -m "2, 2, 3, 4, 8, 16, 32" 
 runargs+=-f .1 -F .9 -u .1 -U .9 -S $(COUNT) -b ../../cfg/base.tp
@@ -93,7 +92,8 @@ plot/oo-done:
 	cd plot/over-one ; time table-over-one.sh $(runargs) ../../data/over-one
 	touch plot/oo-done
 
-plot/all-plots.pdf: plot/UFS-done plot/UFS-alg-done plot/aas-done plot/2D-UFS-done 
+plot/all-plots.pdf: plot/UFS-done plot/UFS-alg-done plot/aas-done plot/2D-UFS-done \
+    plot/cs-ratio/cs-ratio.pdf
 	cd plot/ ; time all-plots.sh
 	cd plot/ ; time pdflatex all-plots.tex > /dev/null
 

@@ -3,8 +3,9 @@
 
 Evaluation of \tpj{} and the non-preemptive multi-threaded task model
 presented in this work focuses on the schedulability ratio of
-synthetic task sets. The ratio of task set specifications deemed
-schedulable by \tpj{} for EDF-NP will be compared to \npchunks{} in
+synthetic task sets and a case study based upon the evaluation of
+\bundlep{}~\cite{Tessler:2018b}. The ratio of task set specifications
+deemed schedulable by \tpj{} for EDF-NP will be compared to \npchunks{} in
 both limited and fully preemptive settings for EDF. What follows is a 
 description of the parameters to task set specification generation,
 the prescribed evaluation metrics, and analysis of the results.
@@ -46,16 +47,7 @@ from~\cite{Bertogna:2010} and the dependent ${m}$ values were selected
 to avoid one task consuming more than half of the threads in the
 task set specification (where possible). 
 
-% \input{\tex{10-specification-parameters.tex}}
-
-\subsubsection{Synthetic Tasks and Applicability of Parameters}
-
-Synthetic task sets are the basis for the evaluation out of
-necessity. Currently, we are unaware of any hard real-time
-multi-threaded task sets that have been accepted as representative of
-real-world applications suitable for research. While such a task set
-would be a benefit, it would also likely require similar extrapolation
-techniques to match the more than 500,000 task sets considered herein.
+\subsubsection{Applicability of Parameters}
 
 To avoid favoring \tpj{}, the task set generation parameters ${m}$ and
 \GFactor{} were carefully selected. For the threads per task ${m}$, a
@@ -71,6 +63,29 @@ in~\cite{Tessler:2018b} produces growth factors below 0.1 for
 \texttt{ud}, \texttt{nsichneu}, and others. Smaller \GFactor{} values
 benefit \tpj{}, setting the lower bound of \GFactor{} to 0.1 restricts
 \tpj{}'s performance below observations.
+
+\subsection{Case Study}
+
+\bundlep{}'s evaluation covers 18 benchmarks for distinct architecture
+configurations. An architecture configuration includes the block
+reload time (BRT), cycles per instruction (CPI), and number of cache
+lines. One of the least favorable in terms of the analytical
+benefit of \bundlep{} is a BRT of 100, CPI of one, and 32 cache
+lines. From this configuration, the WCET values and growth factors
+were extracted, growth factors ranging in the range
+${[0.08,3.02]}$.\footnote{Due to length restrictions the full listing
+  of WECT and growth factors are omitted.}
+
+From these results of \bundlep{} 1000 task sets with 18 tasks (one per
+benchmark) and a total 100 threads were generated per utilization
+target. The utilization target ranged from 0.1 to 1.0 increments of
+0.1. Threads were assigned to each task \task{i} from a distribution
+over ${m_i \in [2,8]}$. Each tasks utilization, period, and deadline,
+${c_i(m_i)}$ were assigned using the same method as synthetic tasks.
+The WCET values for fewer threads ${1 \le k < m_i}$, were scaled such
+that the value of ${c_i(k) / c_i(m_i)}$ remained constant after the
+${c_i(m_i) = \lceil p_i \cdot U_i \rceil}$ assignment.
+
 
 \subsection{Evaluation Metrics}
 
@@ -116,7 +131,8 @@ synopsis of the schedulability tests. Schedulability ratios for each
 of the combinations are calculated for every ${(M, m, U, \GFactor{})}$ 
 configuration.
 
-\begin{wraptable}{l}{.6\linewidth}
+%\begin{wraptable}{l}{.6\linewidth}
+  \begin{table}
   \center
   \begin{tabular}{|c|c|l|l|}
     \hline
@@ -132,7 +148,8 @@ configuration.
   \end{tabular}
   \caption{Schedulability Test Combinations}
   \label{table:combinations}
-\end{wraptable}
+  \end{table}
+%\end{wraptable}
 
 It must be noted that EDF-P:M is an unrealistic schedulability
 test. It serves only as a theoretical limit to the benefits of concave
@@ -141,8 +158,8 @@ job without preemption by another job with a \texttt{BUNDLE}-based
 thread-level scheduler.  However, current \texttt{BUNDLE}
 implementations require that an executing task cannot be
 preempted by a different task.  Such a preemption would destroy the
-cache benefits and analysis of \texttt{BUNDLE} scheduling. EDF-P:M
-performs analysis assuming preemptions between jobs are allowed and
+cache benefits and analysis of \texttt{BUNDLE} scheduling. Analysis of
+EDF-P:M assumes preemptions between jobs are allowed and
 have zero cost. It is included as a reference for \tpj{}'s
 performance, as a ceiling for what is theoretically possible given
 ideal (but likely impossible) conditions.
@@ -157,13 +174,11 @@ is capable of scheduling task sets that preemptive EDF cannot.
 
 For a task set specification configuration ${(M, m, U, \GFactor{})}$,
 call ${S}$ the set of all task set specifications \ants{} generated
-for the configuration. Call ${s}$ the set of ${\tasks{}^1}$
-transformed from ${\ants{} \in S}$ such that ${\tasks{}^1}$ are
-infeasible for EDF-P:1 due to the utilization of ${\tasks{}^1}$
-exceeding one. The set \stpj{} is the subset of ${s}$ deemed feasible
+for the configuration. Call ${s}$ the set of ${\tasks{}^1}$ task sets
+transformed from ${\ants{} \in S}$ such that ${\tasks{}^1}$ has
+utilization greater than one. The set \stpj{} is the subset of ${s}$ deemed feasible
 by the \tpj{} schedulability test. That is, \stpj{} is the set of all
-tasks \tpj{} could schedule, but EDF-P:1 could not -- even considering
-EDF-P:1 does not account for CRPD overhead that
-EDF-P:1 would incur in a real system implementation. 
+tasks \tpj{} could schedule, but EDF-P:1 could not (even) when CRPD
+values are zero.
 
 \input{\tex{30-results.tex}}
