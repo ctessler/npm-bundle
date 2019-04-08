@@ -43,7 +43,6 @@
       c_k(m_k)}$ of moving one thread of \task{y} to \task{x}, as the
     operation of adding the difference of WCET values for
     ${c_x(m_x + 1)}$ and ${c_y(m_y - 1)}$ to the sum. 
-    
     \begin{eqnarray*}
       \lefteqn{
       \left(\sum_{\task{k} \in \Partial{k}} c_k(m_k) \right)
@@ -57,7 +56,6 @@
     ${m_y \le m_x}$, the quantity ${(c_x(m_x + 1) - c_x(m_x))}$ is
     less than or equal to ${(c_y(m_y) - c_y(m_y - 1))}$ so the
     difference must be less than or equal to zero. Therefore:
-
     \begin{equation*}
       \left(\sum_{\task{k} \in \Partial{k}} c_k(m_k) \right)
       + (c_x(m_x + 1) - c_x(m_x)) - (c_y(m_y) - c_y(m_y - 1)) \le 
