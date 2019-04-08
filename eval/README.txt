@@ -29,9 +29,31 @@ Usage:
 	make plot	# Creates the plots from the data
 	make		# Will *only* generate the plots
 
+Products:
+	plots/all-plots.pdf	# A single PDF with all the possible
+				# plots that could be considered
+				# useful
+	plots/<DIRECTORY>/*.pdf	# Individual plots by category and
+				# parameter. 
 
-			FROM A FRESH CHECKOUT
+Environment Variables:
+
+	COUNT	# The number of task sets per configuration,
+		# default 1000
+	J	# The number of processes to fork during generation,
+		# default 5
+
+
+		  COMPLETE RUN FROM A FRESH CHECKOUT
 
 > make run	# Go out for the weekend
 > make data	
 > make plot	# Full results in plot/all-plots.pdf
+
+
+		ABBREVIATED RUN FROM A FRESH CHECKOUT
+
+> COUNT=10 make run
+> COUNT=10 make data
+> COUNT=10 make plot
+
