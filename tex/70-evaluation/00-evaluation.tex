@@ -92,11 +92,11 @@ ${c_i(m_i) = \lceil p_i \cdot U_i \rceil}$ assignment.
 \tpj{} is compared with the \npchunks{} schedulability test in
 non-preemptive (EDF-NP) and preemptive (EDF-P) settings. The focus of
 the evaluation is on the non-preemptive setting. The preemptive
-setting serves as a comparison against the theoretical best case. For EDF-P,
-preemptions incur \textbf{no} penalty, CRPD or otherwise. In this
-highly advantageous setting for EDF-P, \tpj{} produces
-feasible task sets \npchunks{} deems infeasible in a
-preemptive setting.
+setting serves as a comparison to alternative scheduling strategies
+and the theoretical best case. For EDF-P, preemptions incur
+\textbf{no} penalty, CRPD or otherwise. In this highly advantageous
+setting for EDF-P, \tpj{} produces feasible task sets \npchunks{}
+deems infeasible in a preemptive setting.
 
 To compare schedulability tests, each task set specification \ants{}
 is provided to \tpj{} without modification under EDF-NP
@@ -117,22 +117,8 @@ algorithm. This is achieved by modifying an anterior task \ant{j} with
 ${\hat{m}_j > 1}$ and ${\hat{c}_j(\hat{m}_j)}$ to a posterior task
 \task{j} with ${m_j = 1}$ and ${c_j(1) = \hat{c}_j(\hat{m}_j)}$. 
 
-The \npchunks{} schedulability test will produce results for
-${\tasks{}^1}$ and ${\tasks{}^m}$ in both preemptive and
-non-preemptive settings. For non-preemptive schedulability analysis,
-each task ${\task{i} \in \tasks{}^1}$ or ${\tasks{}^m}$ must have a
-non-preemptive chunk size ${q_i \ge c_i(m_i)}$. When evaluating
-preemptive EDF schedulability for ${\tasks{}^1}$ and ${\tasks{}^m}$,
-the results are labeled EDF-P:1 and EDF-P:M respectively. When
-evaluating non-preemptive EDF schedulability, the results are labeled
-EDF-NP:1 and EDF-NP:M. Schedulability results for \tpj{} under EDF-NP
-scheduling are labeled EDF-TPJ. Table~\ref{table:combinations} gives a
-synopsis of the schedulability tests. Schedulability ratios for each
-of the combinations are calculated for every ${(M, m, U, \GFactor{})}$ 
-configuration.
-
-%\begin{wraptable}{l}{.6\linewidth}
-  \begin{table}
+\begin{wraptable}[7]{l}{.55\linewidth}
+%  \begin{table}
   \center
   \begin{tabular}{|c|c|l|l|}
     \hline
@@ -148,8 +134,23 @@ configuration.
   \end{tabular}
   \caption{Schedulability Test Combinations}
   \label{table:combinations}
-  \end{table}
-%\end{wraptable}
+%  \end{table}
+\end{wraptable}
+
+The \npchunks{} schedulability test will produce results for
+${\tasks{}^1}$ and ${\tasks{}^m}$ in both preemptive and
+non-preemptive settings. For non-preemptive schedulability analysis,
+each task ${\task{i} \in \tasks{}^1}$ or ${\tasks{}^m}$ must have a
+non-preemptive chunk size ${q_i \ge c_i(m_i)}$. When evaluating
+preemptive EDF schedulability for ${\tasks{}^1}$ and ${\tasks{}^m}$,
+the results are labeled EDF-P:1 and EDF-P:M respectively. When
+evaluating non-preemptive EDF schedulability, the results are labeled
+EDF-NP:1 and EDF-NP:M. Schedulability results for \tpj{} under EDF-NP
+scheduling are labeled EDF-TPJ. Table~\ref{table:combinations} gives a
+synopsis of the schedulability tests. Schedulability ratios for each
+of the combinations are calculated for every ${(M, m, U, \GFactor{})}$ 
+configuration.
+
 
 It must be noted that EDF-P:M is an unrealistic schedulability
 test. It serves only as a theoretical limit to the benefits of concave
@@ -178,7 +179,7 @@ for the configuration. Call ${s}$ the set of ${\tasks{}^1}$ task sets
 transformed from ${\ants{} \in S}$ such that ${\tasks{}^1}$ has
 utilization greater than one. The set \stpj{} is the subset of ${s}$ deemed feasible
 by the \tpj{} schedulability test. That is, \stpj{} is the set of all
-tasks \tpj{} could schedule, but EDF-P:1 could not (even) when CRPD
+tasks \tpj{} could schedule, yet EDF-P:1 could not (even) when CRPD
 values are zero.
 
 \input{\tex{30-results.tex}}
