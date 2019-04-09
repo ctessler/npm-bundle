@@ -151,6 +151,21 @@ following URL:
 
 \subsection{Generating Data and Plots}
 
+GNUPlot, inkscape, and pdflatex are necessary dependencies for
+generating the plots (this step has already been performed on the
+Virtual Machine). 
+
+\begin{lstlisting}[language=bash]
+  bundle@osboxes:~$ sudo apt-get install texlive-latex-base
+  bundle@osboxes:~$ sudo apt-get install texlive-fonts-recommended \
+      texlive-fonts-extra
+  bundle@osboxes:~$ sudo apt-get install texlive
+  bundle@osboxes:~$ sudo apt-get install texlive-science texlive-font-utils
+  bundle@osboxes:~$ sudo apt-get install texlive-bibtex-extra
+  bundle@osboxes:~$ sudo apt-get install inkscape
+  bundle@osboxes:~$ sudo apt-get install gnuplot
+\end{lstlisting}
+
 The evaluation is incorporated with the latex structure of the
 article. Clone the most recent version from the following URL
 
@@ -196,13 +211,13 @@ processes that can be forked during a run.\\
 
 
 {\noindent}On the virtual machine, a sample run has been completed for
-\texttt{COUNT=100} and \texttt{J=2} by issuing the following commands:
+\texttt{COUNT=10} and \texttt{J=2} by issuing the following commands:
 
 \begin{lstlisting}[language=bash]
   bundle@osboxes:~$ cd npm-bundle/npm-bundle/eval/
-  bundle@osboxes:~/npm-bundle/npm-bundle/eval$ COUNT=100 J=2 make run
-  bundle@osboxes:~/npm-bundle/npm-bundle/eval$ COUNT=100 J=2 make data
-  bundle@osboxes:~/npm-bundle/npm-bundle/eval$ COUNT=100 J=2 make plot
+  bundle@osboxes:~/npm-bundle/npm-bundle/eval$ COUNT=10 J=2 make run
+  bundle@osboxes:~/npm-bundle/npm-bundle/eval$ COUNT=10 J=2 make data
+  bundle@osboxes:~/npm-bundle/npm-bundle/eval$ COUNT=10 J=2 make plot
 \end{lstlisting}
 
 {\noindent}The results can be found in the plot dircetory
@@ -240,9 +255,30 @@ data.
 
 {\noindent}Verify the plots have been generated.
 \begin{lstlisting}[language=bash]
+  # All possible plots that could be used.
   bundle@osboxes:~/npm-bundle/npm-bundle/eval$ evince plot/all-plots.pdf
 \end{lstlisting}
 
+{\noindent}The individual figures can be found as PDF's in the following
+locations 
+\begin{table}[ht]
+  \centering
+  \begin{tabular}{r|l}
+    Figure & Plot \\
+    \hline
+    5 & plot/cs-ratio/cs-ratio.pdf \\
+    6 & plot/avg-alg-sched/avg-ratio-TPJ-i.pdf \\
+    7a & plot/avg-alg-sched/avg-ratio-NP-1.pdf \\
+    7b & plot/avg-alg-sched/avg-ratio-NP-m.pdf \\
+    8a & plot/2D-UFS/2D-M010m04F0\_5xS.pdf \\
+    8b & plot/2D-UFS/2D-M007m03U0\_5xS.pdf \\
+    9a & plot/2D-UFS/2D-M025m08U0\_7xS.pdf \\
+    9b & plot/2D-UFS/2D-M025m08F0\_9xS.pdf \\
+    10a & plot/2D-UFS/2D-M100m32F0\_4xS.pdf \\
+    10b & plot/2D-UFS/2D-M100m32U0\_5xS.pdf \\
+    11 & plot/2D-UFS/2D-M003m02U0\_7xS.pdf
+  \end{tabular}
+\end{table}
 
 \subsection{Generating the Article}
 
