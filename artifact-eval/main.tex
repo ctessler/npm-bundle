@@ -1,0 +1,278 @@
+\documentclass[a4paper]{article}
+
+\usepackage[margin=0.5in]{geometry}
+
+\usepackage{xcolor}
+\usepackage{listings}
+\lstset{basicstyle=\small\ttfamily,
+  commentstyle=\color{blue},
+  stringstyle=\color{brown},
+  commentstyle=\color{gray},
+  %  moredelim=**[is][\color{red}]{@}{@}
+  escapeinside={<@}{@>}
+  }
+\usepackage{hyperref}
+
+\newcommand{\npmbundle}{\texttt{NPM-BUNDLE}}
+
+\begin{document}
+
+% TITLE
+\title{\npmbundle{} ARTIFACT EVALUATION}
+\author{Corey Tessler and Nathan Fisher}
+\maketitle
+
+\section{Introduction}
+
+Artifact evaluation for NPM-BUNDLE is identical to the process used in
+performing the research and writing. There are three components:
+libsched, data generation, and document compilation. This document is
+written for the evaluator that will use the Virtual Machine to
+reproduce the results and (as a byproduct) the article. Although
+focused on the Virtual Machine user, these instructions should be
+sufficient to build the scheduling library and article from source
+available on github.
+
+Please direct any questions to Corey Tessler at \href{mailto:corey.tessler@wayne.edu}{corey.tessler@wayne.edu}.
+
+\subsection{Abbreviated Instructions}
+
+These abbreviated instructions use the pre-built libsched library to
+produce a new version of the results as quickly as possible. More
+detailed instructions are given in the following section.
+
+\begin{description}
+  \item[Virtual Machine] \hfill \\
+    Long URL: \href{https://waynestateprod-my.sharepoint.com/:f:/g/personal/fh3227\_wayne\_edu/EprJwQXLTvBFo6n5XGh5-PUBBIL87kMSCfwKUTH8vlyx4w?e=Fcp1yY}{https://waynestateprod-my.sharepoint.com/:f:/g/personal/fh3227\_wayne\_edu/EprJwQXLTvBFo6n5XGh5-PUBBIL87kMSCfwKUTH8vlyx4w?e=Fcp1yY} \\
+    Short URL: \href{https://bit.ly/2VwM3eF}{https://bit.ly/2VwM3eF}
+    \hfill \\
+    User/Pass: bundle/bundle \\
+
+    Download the latest NPM-BUNDLE-${<}$VER${>}$.zip image, compatible
+    with VirtualBox. Give the Virtual Machine a minimum of 1GB of ram
+    (the more the better). Connect via the VirtualBox graphical
+    console or SSH.
+    
+  \item[Generate Data and Graphs] \hfill \\
+    \begin{lstlisting}[language=bash]
+# Update the PATH for the default installation
+bundle@osboxes:~/npm-bundle/libsched$ . bin/npm-paths.sh
+
+# Build the graphs (will take 72 hours or more)
+bundle@osboxes:~$ cd npm-bundle/npm-bundle/eval/
+bundle@osboxes:~/npm-bundle/npm-bundle/eval$ make sanitary && \
+    make run && \
+    make data && \
+    make plot
+    \end{lstlisting}
+  \item[Verify the Products] \hfill \\
+    \begin{lstlisting}[language=bash]
+# All possible graphs
+bundle@osboxes:~/npm-bundle/npm-bundle/eval$ evince plot/all-plots.pdf
+    \end{lstlisting}
+  \item[Generate the Article] \hfill \\
+    \begin{lstlisting}[language=bash]
+# Generates the latest version with the fresh plots
+bundle@osboxes:~$ cd ~/npm-bundle/npm-bundle/
+bundle@osboxes:~/npm-bundle/npm-bundle$ make
+bundle@osboxes:~/npm-bundle/npm-bundle$ evince npm-bundle.pdf
+    \end{lstlisting}
+\end{description}
+
+\clearpage
+
+\section{Complete Instructions}
+
+In this section, the complete instructions for building all of the
+evaluation components from source are given. An evaluator that wishes
+to use the Virtual Machine should skip to subsection~\ref{sec:running}.
+
+There are three parts, the first builds libsched. The
+libsched library provides the task set generation and schedulability
+tests used in the work. The second part generates the data and plots
+used in the work. The final part generates the article. These
+instructions are identical to those for the Virtual Machine, which is
+built from an up-to-date Ubuntuu 18.10 (as of 2019/04/09).
+
+\subsection{libsched}
+
+The library is available on github with release tag v1.0 at the
+following URL:
+
+\href{https://github.com/ctessler/libsched/releases/tag/v1.0}{https://github.com/ctessler/libsched/releases/tag/v1.0} \\
+
+{\noindent}Begin by installing the dependencies for libsched.
+
+\begin{lstlisting}[language=bash]
+  bundle@osboxes:~$ sudo apt-get install valgrind libcunit1-dev libgsl0-dev
+\end{lstlisting}
+
+{\noindent}Check out libsched
+\begin{lstlisting}[language=bash]
+  bundle@osboxes:~$ mkdir npm-bundle
+  bundle@osboxes:~/npm-bundle$ git clone https://github.com/ctessler/libsched.git
+\end{lstlisting}
+
+{\noindent}Build libsched
+\begin{lstlisting}[language=bash]
+  bundle@osboxes:~/npm-bundle/libsched$ make
+\end{lstlisting}
+
+{\noindent}Upon success, there will be several products in the bin directory.
+\begin{lstlisting}[language=bash]
+  bundle@osboxes:~/npm-bundle/libsched$ ls bin
+  maxchunks  ts-deadline-bb  ts-gen    ts-gentp-forwcet  ts-merge  unittest
+  tpj        ts-divide       ts-gentp  ts-gf             ts-print  uunifast
+\end{lstlisting}
+
+{\noindent}Verify the tpj schedulability test is operational by
+\begin{lstlisting}[language=bash]
+  bundle@osboxes:~/npm-bundle/libsched$ bin/tpj -s ex/one_split.ts
+  Task set file: ex/one_split.ts
+  Task Set:
+  1: (p:  10, d:   5, m: 1) [u:0.100, q:0, t.1]  wcet{  1}
+  2: (p:  30, d:  30, m: 2) [u:0.200, q:0, t.2]  wcet{  3,   6}
+
+  After assigning non-preemptive chunks
+  1: (p:  10, d:   5, m: 1) [u:0.100, q:1, t.1]  wcet{  1}
+  2: (p:  30, d:  30, m: 1) [u:0.100, q:3, t.2]  wcet{  3}
+  3: (p:  30, d:  30, m: 1) [u:0.100, q:3, t.2]  wcet{  3}
+  -------------------------------------------------
+  Utilization: 0.3000, T*: 30, Feasible: Yes
+\end{lstlisting}
+
+{\noindent}\textbf{Add the binary directory to the working PATH}
+\begin{lstlisting}[language=bash]
+  bundle@osboxes:~/npm-bundle/libsched/bin$ pwd
+      /home/bundle/npm-bundle/libsched/bin
+  bundle@osboxes:~/npm-bundle/libsched/bin$ export \
+      PATH=${PATH}:/home/bundle/npm-bundle/libsched/bin
+\end{lstlisting}
+
+\subsection{Generating Data and Plots}
+
+The evaluation is incorporated with the latex structure of the
+article. Clone the most recent version from the following URL
+
+\href{http://github.com/ctessler/npm-bundle.git}{http://github.com/ctessler/npm-bundle.git}
+
+\begin{lstlisting}[language=bash]
+  bundle@osboxes:~$ cd npm-bundle/
+  bundle@osboxes:~/npm-bundle$ git clone https://github.com/ctessler/npm-bundle.git
+\end{lstlisting}
+
+\subsubsection{Running the evaluation}\label{sec:running}
+
+The binaries from libsched and the shell scripts of the evaluation
+must be in the current path for the evaluation to run. Make sure to
+add them by one of the following methods (the second method is only
+available to those using the Virtual Machine).
+
+\begin{lstlisting}[language=bash]
+  # Option 1
+  bundle@osboxes:~$ export PATH=${PATH}:~/npm-bundle/libsched/bin
+  bundle@osboxes:~$ export PATH=${PATH}:~/npm-bundle/npm-bundle/eval/bin
+\end{lstlisting}
+
+\begin{lstlisting}[language=bash]
+  # Option 2 (Only available on the Virtual Machine)
+  bundle@osboxes:~$ . bin/npm-paths.sh
+\end{lstlisting}
+
+{\noindent}Verify the PATH is set correctly
+\begin{lstlisting}[language=bash]
+  bundle@osboxes:~$ echo $PATH
+    /home/bundle/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:
+    /sbin:/bin:/usr/games:/usr/local/games:/snap/bin:
+    <@\textcolor{blue}{/home/bundle/npm-bundle/libsched/bin:/home/bundle/npm-bundle/npm-bundle/eval/bin}@>
+\end{lstlisting}
+
+
+{\noindent}The evaluation runs from within the \texttt{npm-bundle.git/eval}
+directory, there are two environment variables that control the
+performance and scale of the run. \texttt{COUNT} impacts the scale,
+the default is 1,000. \texttt{J} sets a limit on the number of
+processes that can be forked during a run.\\
+
+
+{\noindent}On the virtual machine, a sample run has been completed for
+\texttt{COUNT=100} and \texttt{J=2} by issuing the following commands:
+
+\begin{lstlisting}[language=bash]
+  bundle@osboxes:~$ cd npm-bundle/npm-bundle/eval/
+  bundle@osboxes:~/npm-bundle/npm-bundle/eval$ COUNT=100 J=2 make run
+  bundle@osboxes:~/npm-bundle/npm-bundle/eval$ COUNT=100 J=2 make data
+  bundle@osboxes:~/npm-bundle/npm-bundle/eval$ COUNT=100 J=2 make plot
+\end{lstlisting}
+
+{\noindent}The results can be found in the plot dircetory
+\begin{lstlisting}[language=bash]
+  bundle@osboxes:~$ evince npm-bundle/npm-bundle/eval/plot/all-plots.pdf
+\end{lstlisting}
+
+{\noindent}To make a new evaluation run using the default values of
+\texttt{COUNT=1000} and \texttt{J=5} issue the following
+command. Note, the task sets, their periods and deadlines are randomly
+generated and may produce large hyperperiods which increase the number
+of interval lengths that need to be checked. The larger the
+\texttt{COUNT} the more likely large hyperperiods will be generated
+creating ``hard'' to test task sets. The author has experienced task
+sets that take more than \emph{72} hours to complete.
+
+\begin{lstlisting}[language=bash]
+  bundle@osboxes:~$ cd npm-bundle/npm-bundle/eval/
+  bundle@osboxes:~/npm-bundle/npm-bundle/eval$ make run
+  # Go away for a few days.
+\end{lstlisting}
+
+{\noindent}When completed, a new run directory will contain the
+numerical results. To generate plots, the run must be promoted to
+data. 
+
+\begin{lstlisting}[language=bash]
+  bundle@osboxes:~/npm-bundle/npm-bundle/eval$ make data
+\end{lstlisting}
+
+{\noindent}Plots are made from the current data set.
+\begin{lstlisting}[language=bash]
+  bundle@osboxes:~/npm-bundle/npm-bundle/eval$ make plot
+\end{lstlisting}
+
+{\noindent}Verify the plots have been generated.
+\begin{lstlisting}[language=bash]
+  bundle@osboxes:~/npm-bundle/npm-bundle/eval$ evince plot/all-plots.pdf
+\end{lstlisting}
+
+
+\subsection{Generating the Article}
+
+To generate the article the plots must be linked into the build
+structure (this step has already been performed on the Virtual
+Machine).
+
+\begin{lstlisting}[language=bash]
+  bundle@osboxes:~$ cd npm-bundle/npm-bundle/tex/
+  bundle@osboxes:~/npm-bundle/npm-bundle/tex$ ln -s ../eval/plot plot
+\end{lstlisting}
+
+{\noindent}Make the article.
+\begin{lstlisting}[language=bash]
+  bundle@osboxes:~$ cd npm-bundle/npm-bundle/
+  bundle@osboxes:~/npm-bundle/npm-bundle$ make
+\end{lstlisting}
+
+{\noindent}Verify the result.
+\begin{lstlisting}[language=bash]
+  bundle@osboxes:~/npm-bundle/npm-bundle$ evince npm-bundle.pdf
+\end{lstlisting}
+
+\subsection{Success!}
+
+Having created the all-plots.pdf and npm-bundle.pdf documents, the
+complete set of artifacts have been reproduced. Those that wish to make
+changes to the schedulability tests should examine the README.md
+within the libsched directory. Those that wish to augment the
+evaluation of this article should begin with the README.txt in the
+eval/ directory of npm-bundle.git.
+
+\end{document}
