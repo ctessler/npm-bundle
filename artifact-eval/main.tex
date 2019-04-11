@@ -1,7 +1,7 @@
 \documentclass[a4paper]{article}
 
 \usepackage[margin=0.5in]{geometry}
-
+\usepackage{float}
 \usepackage{xcolor}
 \usepackage{listings}
 \lstset{basicstyle=\small\ttfamily,
@@ -58,7 +58,7 @@ detailed instructions are given in the following section.
 # Update the PATH for the default installation
 bundle@osboxes:~/npm-bundle/libsched$ . bin/npm-paths.sh
 
-# Build the graphs (will take 72 hours or more)
+# Build the graphs (observed times 2-72 hours)
 bundle@osboxes:~$ cd npm-bundle/npm-bundle/eval/
 bundle@osboxes:~/npm-bundle/npm-bundle/eval$ make sanitary && \
     make run && \
@@ -96,10 +96,10 @@ built from an up-to-date Ubuntuu 18.10 (as of 2019/04/09).
 
 \subsection{libsched}
 
-The library is available on github with release tag v1.0 at the
+The library is available on github with release tag v1.1 at the
 following URL:
 
-\href{https://github.com/ctessler/libsched/releases/tag/v1.0}{https://github.com/ctessler/libsched/releases/tag/v1.0} \\
+\href{https://github.com/ctessler/libsched/releases/tag/v1.1}{https://github.com/ctessler/libsched/releases/tag/v1.1} \\
 
 {\noindent}Begin by installing the dependencies for libsched.
 
@@ -110,7 +110,10 @@ following URL:
 {\noindent}Check out libsched
 \begin{lstlisting}[language=bash]
   bundle@osboxes:~$ mkdir npm-bundle
-  bundle@osboxes:~/npm-bundle$ git clone https://github.com/ctessler/libsched.git
+  bundle@osboxes:~/npm-bundle$ git clone  https://github.com/ctessler/libsched.git
+  # Switch to the tag if necessary (not necessary for the Virtual Machine)
+  bundle@osboxes:~/npm-bundle$ cd libsched
+  bundle@osboxes:~/npm-bundle/libssched$ git checkout tags/v1.1
 \end{lstlisting}
 
 {\noindent}Build libsched
@@ -232,12 +235,12 @@ generated and may produce large hyperperiods which increase the number
 of interval lengths that need to be checked. The larger the
 \texttt{COUNT} the more likely large hyperperiods will be generated
 creating ``hard'' to test task sets. The author has experienced task
-sets that take more than \emph{72} hours to complete.
+sets that take more than \emph{72} hours to complete on an Intel Core i5-4690K.
 
 \begin{lstlisting}[language=bash]
   bundle@osboxes:~$ cd npm-bundle/npm-bundle/eval/
   bundle@osboxes:~/npm-bundle/npm-bundle/eval$ make run
-  # Go away for a few days.
+  # Check in every couple of hours.
 \end{lstlisting}
 
 {\noindent}When completed, a new run directory will contain the
@@ -261,8 +264,7 @@ data.
 
 {\noindent}The individual figures can be found as PDF's in the following
 locations 
-\begin{table}[ht]
-  \centering
+\begin{figure}[H]
   \begin{tabular}{r|l}
     Figure & Plot \\
     \hline
@@ -278,7 +280,7 @@ locations
     10b & plot/2D-UFS/2D-M100m32U0\_5xS.pdf \\
     11 & plot/2D-UFS/2D-M003m02U0\_7xS.pdf
   \end{tabular}
-\end{table}
+\end{figure}
 
 \subsection{Generating the Article}
 
