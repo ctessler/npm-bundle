@@ -167,24 +167,28 @@ vcmd $cmd
 tpj_sched=$(schedyn $?)
 
 vecho "" ; vecho "Maximum Chunks (m=1)"
-cmd="maxchunks -s $divided"
+cmd="maxchunks -s $divided -l ${divided}-p.log"
 vcmd $cmd
 mc_sched_lp=$(schedyn $?)
+rm ${divided}-p.log
 
 vecho "" ; vecho "Maximum Chunks (m=1) Non-Preemptive"
-cmd="maxchunks --nonp -s $divided"
+cmd="maxchunks --nonp -s $divided -l ${divided}-np.log"
 vcmd $cmd
 mc_sched_np=$(schedyn $?)
+rm ${divided}-np.log
 
 vecho "" ; vecho "Maximum Chunks (merged) Non-Preemptive"
-cmd="maxchunks --nonp -s $merged"
+cmd="maxchunks --nonp -s $merged -l ${merged}-np.log"
 vcmd $cmd
 mc_sched_merge=$(schedyn $?)
+rm ${merged}-np.log
 
 vecho "" ; vecho "Maximum Chunks (merged) Preemptive"
-cmd="maxchunks -s $merged"
+cmd="maxchunks -s $merged -l ${merged}-p.log"
 vcmd $cmd
 mc_sched_lp_merge=$(schedyn $?)
+rm ${merged}-p.log
 
 vecho "" 
 if [ "$header" -eq "1" ]; then

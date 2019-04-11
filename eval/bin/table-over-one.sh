@@ -200,7 +200,7 @@ EOF
     Total & $ts_total & $oo_total & $tpj_total \\\\
     \hline	  	
   \end{tabular}
-  \caption{EDF-P:1 Infeasible and TPJ Feasibility}
+  \caption{\${U > 1}\$ Feasibility}
   \label{table:by-m}
 EOF
 	cat > over-one.tex <<EOF

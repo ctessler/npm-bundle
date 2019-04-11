@@ -157,11 +157,13 @@ EDF-NP:M is always below EDF-TPJ.
   \label{fig:M3U.7}
 \end{wrapfigure}
 
-Compared to the non-preemptive tests, EDF-TPJ's performance is
-the least beneficial for ${M (< 10)}$ threads and ${U > .4}$
-utilization. An example is given in Figure~\ref{fig:M3U.7}, where
-EDF-TPJ's schedulability ratio remains below 0.40 for all growth
-factors. Preemptive EDF-P:1 schedules nearly double the task sets per
-growth factor of EDF-TPJ. This suggests, the decrease in EDF-TPJ's
+The comparative performance of EDF-TPJ is at its lowest
+for ${M < 10}$ threads and ${U > .4}$ utilization. In these ranges
+EDF-TPJ maintains the highest schedulability ratio among the
+non-preemptive methods, but the ratio is closer to EDF-NP:M or
+EDF-NP:1 than EDF-P:1. An example is given in Figure~\ref{fig:M3U.7}, where
+EDF-TPJ's schedulability ratio remains below 0.60 for all growth
+factors. Preemptive EDF-P:1 maintains a ration closer to 0.80 for all
+growth factors. This suggests, the decrease in EDF-TPJ's
 performance is more likely due to the non-preemptive setting combined
-with the larger WCETs of individual threads.
+with larger WCET values for individual threads.
