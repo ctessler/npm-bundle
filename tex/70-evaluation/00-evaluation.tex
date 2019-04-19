@@ -58,11 +58,10 @@ assigned more than half the total threads: ${m \le \lfloor \frac{M}{2}
 The growth factor \GFactor{} is informed by previous results for
 \bundlep{}~\cite{Tessler:2018b}. In~\cite{Tessler:2018b},
 multi-threaded tasks are constructed from the M{\"a}lardalen WCET
-benchmarks~\cite{Gustafsson:2010}. The analysis
-in~\cite{Tessler:2018b} produces growth factors below 0.1 for
-\texttt{ud}, \texttt{nsichneu}, and others. Smaller \GFactor{} values
-benefit \tpj{}, setting the lower bound of \GFactor{} to 0.1 restricts
-\tpj{}'s performance below observations.
+benchmarks~\cite{Gustafsson:2010}. Task analysis
+in~\cite{Tessler:2018b} yields growth factors below 0.1 for several
+benchmarks. A lower bound (0.1) on \GFactor{} greater than observed
+values is pessimistic, resulting in less favorable results for \tpj{}.
 
 \subsection{Case Study}
 
