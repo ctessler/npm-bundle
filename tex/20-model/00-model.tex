@@ -30,11 +30,13 @@ between the execution requirements of a task and the number of
 threads, where the requirement for one job of ${m_i}$ threads is less
 than ${m_i}$ jobs of one thread. For \texttt{BUNDLE}-based schedulers,
 concavity is the result of the inter-thread cache benefit, where
-${c_i(m) - c_i(m - 1) \ge c_i(m+1) - c_i(m)}$; It is this
-relationship the scheduling behavior and analysis exploit. 
+${c_i(m) - c_i(m - 1) \ge c_i(m+1) - c_i(m)}$; it is this
+relationship the proposed scheduler behavior and analysis exploit seek
+to exploit.
 
 Not all tasks and thread-level schedulers will produce concave WCET
-functions. For a task \task{i} with a convex WCET function, the
+functions. For a task \task{i} with a convex WCET function (where
+there is no benefit in grouping threads together), the
 ${m_i}$ threads of \task{i} may be replaced with ${m_i}$
 single-threaded tasks. These single-threaded have vacuously concave
 WCET functions by virtue of executing no more than one thread.
