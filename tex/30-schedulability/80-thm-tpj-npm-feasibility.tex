@@ -68,8 +68,9 @@
     ${\dot{\tasks{}}}$ minimally starting with ${D_1}$, maximizing the
     slack available for partial task sets with greater deadlines; thus
     the demand of ${\dot{\tasks{}}}$ is minimal and cannot be
-    reduced. For \ants{} to be npm-feasible, the demand of
-    ${\dot{\tasks{}}}$ must be reduced. By contradiction if \ants{} is
-    npm-feasible \tpj{} will return a feasible posterior task set \tasks{}. 
+    reduced. For \ants{} to be npm-feasible, there must be another
+    partial task set that reduces ${\dot{\tasks{}}}$'s demand;
+    which is
+    a direct contradiction. Therefore, \tpj{} must return feasible.  
   \end{proof}
 \end{theorem}
