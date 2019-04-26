@@ -2,11 +2,20 @@
 \newcommand{\cwidth}{.48\linewidth}
 \input{../plot/over-one/over-one.tex}
 
-\begin{wrapfigure}[12]{l}{\cwidth}
-  \includegraphics[width=\linewidth]{plot/cs-ratio/cs-ratio}
-  \caption{\texttt{BUNDLEP} Case Study}
-  \label{fig:cs-ratio}
-\end{wrapfigure}
+\begin{figure}[h]
+  \centering
+  \begin{subfigure}{\cwidth}
+    \includegraphics[width=\linewidth]{plot/cs-ratio/cs-ratio}
+    \caption{\texttt{BUNDLEP} Case Study}
+    \label{fig:cs-ratio}
+  \end{subfigure}%
+  \begin{subfigure}{\cwidth}
+    \includegraphics[width=\linewidth]{plot/avg-alg-sched/avg-ratio-TPJ-i}
+    \caption{EDF-TPJ Summary}
+    \label{fig:avg-ratio-TPJ-i}
+  \end{subfigure}
+  \caption{Case Study and EDF-TPJ Summary Results}
+\end{figure}
 
 Schedulability ratios from the \bundlep{} case study are given in
 Figure~\ref{fig:cs-ratio}. For the target architecture and 18 benchmarks, EDF-TPJ consistently outperforms the other non-preemptive
@@ -16,8 +25,7 @@ utilization values. EDF-TPJ's comparative performance increases
 with the target utilization. This case study demonstrates the benefit
 of \tpj{} to non-preemptive and (potentially) preemptive approaches.
  
-Figures~\ref{fig:avg-ratio-NP-1}, \ref{fig:avg-ratio-NP-m}, and
-\ref{fig:avg-ratio-TPJ-i}, summarize the results for the synthetic
+Figures~\ref{fig:avg-ratio-TPJ-i}, \ref{fig:avg-ratio-NP-1}, and \ref{fig:avg-ratio-NP-m}, summarize the results for the synthetic
 task sets varied by the utilization and growth factor. Within
 each graph, the schedulability ratios provided by EDF-P:1 and EDF-P:M serve as
 references. The difference between EDF-P:1 and the subject of the
@@ -25,25 +33,7 @@ graph illustrate the benefit of preemptive scheduling. Inclusion of
 EDF-PM highlights the theoretical limit of concave growth to
 schedulability.
 
-\begin{wrapfigure}[12]{r}{\cwidth}
-  \includegraphics[width=\linewidth]{plot/avg-alg-sched/avg-ratio-TPJ-i}
-  \caption{EDF-TPJ Summary}
-  \label{fig:avg-ratio-TPJ-i}
-\end{wrapfigure}
-
-Including EDF-P:1 and EDF-P:M in each of the summary
-graphs eases the comparison between EDF-NP:1, EDF-NP:M, and
-EDF-TPJ. Comparing EDF-NP:1 (\ref{fig:avg-ratio-NP-1}) to EDF-NP:M
-(\ref{fig:avg-ratio-NP-m}), illustrates the benefits of the model and
-scheduling mechanism. EDF-NP:M has a consistently higher
-schedulability ratio for all utilizations and growth factors. EDF-TPJ
-(\ref{fig:avg-ratio-TPJ-i}) outperforms EDF-NP:M, with higher schedulability
-ratios for all utilizations and growth factors due to the ability to
-transform task sets. EDF-TPJ performs best among the non-preemptive
-tests across all configurations. Additionally, EDF-TPJ is able to
-schedule task sets deemed infeasible for EDF-P:1.
-
-\begin{figure}[ht]
+\begin{figure}[hb]
   \centering
   \begin{subfigure}{\cwidth}
     \includegraphics[width=\linewidth]{plot/avg-alg-sched/avg-ratio-NP-1}
@@ -58,7 +48,17 @@ schedule task sets deemed infeasible for EDF-P:1.
   \caption{EDF-NP:1 and EDF-NP:M Summary}
 \end{figure}
 
-
+Including EDF-P:1 and EDF-P:M in each of the summary
+graphs eases the comparison between EDF-NP:1, EDF-NP:M, and
+EDF-TPJ. Comparing EDF-NP:1 (\ref{fig:avg-ratio-NP-1}) to EDF-NP:M
+(\ref{fig:avg-ratio-NP-m}), illustrates the benefits of the model and
+scheduling mechanism. EDF-NP:M has a consistently higher
+schedulability ratio for all utilizations and growth factors. EDF-TPJ
+(\ref{fig:avg-ratio-TPJ-i}) outperforms EDF-NP:M, with higher schedulability
+ratios for all utilizations and growth factors due to the ability to
+transform task sets. EDF-TPJ performs best among the non-preemptive
+tests across all configurations. Additionally, EDF-TPJ is able to
+schedule task sets deemed infeasible for EDF-P:1.
 
 Table~\ref{table:by-m} summarizes the infeasible utilization
 findings for the synthetic tasks. For moderate and larger values of
@@ -70,11 +70,10 @@ feasible. This illustrates the large potential of the proposed model,
 in conjunction with concave growth WCET functions of
 thread-level schedulers (e.g. \bundle{} and \bundlep{}).
 
-
-\begin{wraptable}[11]{r}{.4\linewidth}
+\begin{figure}[ht]
   \centering
   \input{../plot/over-one/by-m.tex}
-\end{wraptable}
+\end{figure}
 
 There are two noteworthy trends within the schedulability results.
 The simpler of the two is the relationship between utilization and
@@ -111,14 +110,18 @@ schedule non-preemptively.
 
 \begin{figure}[ht]
   \centering
-  \begin{subfigure}[t]{\cwidth}
-    \includegraphics[width=\linewidth]{plot/2D-UFS/2D-M025m08U0_7xS}%
-  \end{subfigure}%
-  \begin{subfigure}[t]{\cwidth}
-    \includegraphics[width=\linewidth]{plot/2D-UFS/2D-M025m08F0_9xS}%
-  \end{subfigure}%
+  \includegraphics[width=\cwidth]{plot/2D-UFS/2D-M025m08U0_7xS}\quad
+  \includegraphics[width=\cwidth]{plot/2D-UFS/2D-M025m08F0_9xS}%
   \caption{${M > 10}$ EDF-TPJ Performance Above EDF-P:1}
   \label{fig:m25-tpj}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\cwidth]{plot/2D-UFS/2D-M100m32F0_4xS}\quad
+  \includegraphics[width=\cwidth]{plot/2D-UFS/2D-M100m32U0_5xS}%
+  \caption{${M = 100}$ EDF-TPJ Performance}
+  \label{fig:m100-tpj}
 \end{figure}
 
 As ${M}$ increases beyond 10 total threads, the number of infeasible
@@ -128,42 +131,16 @@ threshold utilization and growth factor values. For ${M = 25}$, the
 threshold of utilization is between ${[0.6,0.7]}$ shown in
 Figure~\ref{fig:m25-tpj}.
 
-\begin{figure}[ht]
-  \centering
-  \begin{subfigure}[t]{\cwidth}
-    \includegraphics[width=\linewidth]{plot/2D-UFS/2D-M100m32F0_4xS}%
-%    \caption{${(M,m,U,\GFactor{}) = (100,32,*,0.4)}$}
-  \end{subfigure}%
-  \begin{subfigure}[t]{\cwidth}
-    \includegraphics[width=\linewidth]{plot/2D-UFS/2D-M100m32U0_5xS}%
-%    \caption{${(M,m,U,\GFactor{}) = (100,32,0.5,*)}$}
-  \end{subfigure}%
-  \caption{${M = 100}$ EDF-TPJ Performance}
-  \label{fig:m100-tpj}
-\end{figure}
-
-
 For ${M = 100}$ and ${\GFactor \le 0.4}$, EDF-TPJ outperforms
 EDF-P:1. Figure~\ref{fig:m100-tpj} highlights the advantage of
 EDF-TPJ compared to EDF-P:1 by virtue of concave growth. It also
 highlights the benefit of dividing tasks, as the performance of
 EDF-NP:M is always below EDF-TPJ.
 
-
-\begin{wrapfigure}[12]{l}{\cwidth}
-  \includegraphics[width=\linewidth]{plot/2D-UFS/2D-M003m02U0_7xS}%
-  \caption{}
-%  \caption{${(M,m,U,\GFactor{}) = (3,2,0.7,*)}$}
-  \label{fig:M3U.7}
-\end{wrapfigure}
-
 The comparative performance of EDF-TPJ is at its lowest
 for ${M < 10}$ threads and ${U > .4}$ utilization. In these ranges
 EDF-TPJ maintains the highest schedulability ratio among the
 non-preemptive methods, but the ratio is closer to EDF-NP:M or
-EDF-NP:1 than EDF-P:1. An example is given in Figure~\ref{fig:M3U.7}, where
-EDF-TPJ's schedulability ratio remains below 0.60 for all growth
-factors. Preemptive EDF-P:1 maintains a ration closer to 0.80 for all
-growth factors. This suggests, the decrease in EDF-TPJ's
+EDF-NP:1 than EDF-P:1. This suggests, the decrease in EDF-TPJ's
 performance is more likely due to the non-preemptive setting combined
 with larger WCET values for individual threads.

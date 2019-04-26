@@ -21,6 +21,27 @@ of \task{i} is a function of the number of threads per job,
 
 \input{\tex{20-execution-model}}
 
+%\begin{wrapfigure}[7]{i}{.35\linewidth}
+\begin{figure}[b]
+  \centering
+  \begin{subfigure}{.35\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{preemptivity}
+    \caption{Scheduling Behavior}
+    \label{fig:preemptivity}
+  \end{subfigure}
+  \begin{subfigure}{.58\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{process}  
+    \caption{Schedulability and Transformable Task Sets}
+    \label{fig:process}
+  \end{subfigure}
+  \caption{Scheduling and Schedulability of the Proposed Model}
+\end{figure}
+%\end{wrapfigure}
+
+
+
 Thread-level scheduling algorithms must be characterized by a WCET
 function ${c_i(m_i)}$ for ${m_i}$ threads per job and ${c_i(m_i)}$ must be
 strictly increasing discrete and concave (detailed in
@@ -71,12 +92,13 @@ cannot be scheduled as described, the task set is transformed into a
 set. Processing ceases with a negative result when there are no
 available transformations of \supts{}.
 
-\begin{wrapfigure}[8]{i}{.58\linewidth}
-  \centering
-  \input{../../svg/process.pdf_tex}
-  \caption{Schedulability and Transformable Task Sets}
-  \label{fig:process}
-\end{wrapfigure}
+%% \begin{figure}[ht]
+%%   \centering
+%%   \includegraphics[width=.58\linewidth]{process}  
+%%   \caption{Schedulability and Transformable Task Sets}
+%%   \label{fig:process}
+%% \end{figure}
+
 
 Figure~\ref{fig:process} illustrates the schedulability analysis
 process. Division is the transformative operation of the process and

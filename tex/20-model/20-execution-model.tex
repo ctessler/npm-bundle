@@ -7,13 +7,6 @@ threads within a job of a task, a thread-level scheduler may execute
 threads preemptively. Figure~\ref{fig:preemptivity} illustrates the
 scheduling behavior.
 
-\begin{wrapfigure}[7]{i}{.35\linewidth}
-  \centering
-  \input{../../svg/preemptivity.pdf_tex}
-  \caption{Scheduling Behavior}
-  \label{fig:preemptivity}
-\end{wrapfigure}
-
 In Figure~\ref{fig:preemptivity}, at ${t = 1}$ a job of \task{2} is
 released. The job of \task{2} cannot be preempted by the job of \task{1} 
 released at ${t = 5}$. During the execution of \task{2}, the two

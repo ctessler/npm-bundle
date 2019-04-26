@@ -30,8 +30,6 @@ distribution over [10, 1000]. Utilization ${u_i}$ of each task
 \task{i} is calculated using the ${\text{UUniFast}(n,
   U)}$~\cite{Bini:2004} algorithm, where ${n = |\tasks{}|}$.
 
-\input{\tex{10-alternate-parameters.tex}}
-
 A task's WCET is assigned for ${m_i}$ threads,
 ${c_i(m_i) = \lceil p_i \cdot U_i \rceil}$. Tasks
 are given a growth factor ${\GFactor{}_i}$ in a uniform real
@@ -46,7 +44,9 @@ specifications are generated. Figure~\ref{fig:gen-params} summarizes
 the parameters of task set generation. The smaller values of ${M}$ are taken
 from~\cite{Bertogna:2010} and the dependent ${m}$ values were selected
 to avoid one task consuming more than half of the threads in the
-task set specification (where possible). 
+task set specification (where possible).
+
+\input{\tex{10-alternate-parameters.tex}}
 
 \subsubsection{Applicability of Parameters}
 
@@ -117,9 +117,8 @@ algorithm. This is achieved by modifying an anterior task \ant{j} with
 ${\hat{m}_j > 1}$ and ${\hat{c}_j(\hat{m}_j)}$ to a posterior task
 \task{j} with ${m_j = 1}$ and ${c_j(1) = \hat{c}_j(\hat{m}_j)}$. 
 
-\begin{wraptable}[7]{l}{.55\linewidth}
-%  \begin{table}
-  \center
+\begin{figure}[ht]
+  \centering
   \begin{tabular}{|c|c|l|l|}
     \hline
     \textbf{Test} & \textbf{Task Set} & \textbf{EDF-NP} & \textbf{EDF-P} \\
@@ -134,8 +133,7 @@ ${\hat{m}_j > 1}$ and ${\hat{c}_j(\hat{m}_j)}$ to a posterior task
   \end{tabular}
   \caption{Schedulability Test Combinations}
   \label{table:combinations}
-%  \end{table}
-\end{wraptable}
+\end{figure}
 
 The \npchunks{} schedulability test will produce results for
 ${\tasks{}^1}$ and ${\tasks{}^m}$ in both preemptive and

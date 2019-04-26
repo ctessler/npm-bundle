@@ -164,6 +164,11 @@ function make_table {
     \hline
     \hline
 EOF
+
+	local row_name='${(M, m)}$ &';
+	local row_S='${|S|}$ &';
+	local row_s='${|s|}$ &';
+	local row_stpj='${|\stpj{}|}$ &';
 	for totm in ${M[*]}
 	do
 		tpj=${m[0]}
@@ -178,7 +183,13 @@ EOF
 		local oo_total=${vals[1]}
 		local tpj_total=${vals[2]}
 		local oo_ratio=${vals[3]}
-		local tpj_ratio=${vals[4]}		
+		local tpj_ratio=${vals[4]}
+
+		row_name="${row_name} \${($totm, $tpj)}\$ &";
+		row_S="${row_S} $ts_total &";
+		row_s="${row_s} $oo_total &";
+		row_stpj="${row_stpj} $tpj_total &";
+		
 		cat >> by-m.tex <<EOF
       \${($totm, $tpj)}\$ & $ts_total & $oo_total & $tpj_total \\\\
       \hline
@@ -193,6 +204,25 @@ EOF
 	tpj_total=${vals[2]}
 	oo_ratio=${vals[3]}
 	tpj_ratio=${vals[4]}
+
+	row_name="${row_name} Total \\\\";
+	row_S="${row_S} $ts_total \\\\";
+	row_s="${row_s} $oo_total \\\\";
+	row_stpj="${row_stpj} $tpj_total \\\\";
+
+	cat > by-m-horiz.tex <<EOF
+\begin{tabular}{|r||c|c|c|c|c|c|c||l|}
+\hline
+$row_name
+$row_S
+$row_s
+$row_stpj
+\hline
+\end{tabular}
+\caption{\${U > 1}\$ Feasibility}
+\label{table:by-m}
+EOF
+	
 
 	
 	cat >> by-m.tex <<EOF
