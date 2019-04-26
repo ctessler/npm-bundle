@@ -7,11 +7,12 @@
   \begin{proof}
     \emph{Forward Direction} (\tpj{} returns feasible for \ants{}
     ${\implies \exists}$ a posterior task set ${\tasks{}~|~\tasks{}}$
-    is npm-feasible): The \tpj{} algorithm has found and returned a 
-    posterior task set \tasks{} such that the supply has exceeded the
-    demand across intervals of length ${0 \le t \le T^*(\tasks{})}$
-    where every job of \task{i} executes  non-preemptively for
-    ${c_i(m_i) \le q_i}$ time units. Therefore, \tasks{} is npm-feasible.
+    is npm-feasible): The \tpj{} algorithm returned a 
+    posterior task set \tasks{} where the infeasibility condition
+    (Equation~\ref{eq:baruah-07}) is never satisfied across intervals
+    of length ${0 \le t \le T^*(\tasks{})}$ and every job of
+    ${\task{i} \in \tasks{}}$ executes non-preemptively for ${c_i(m_i)
+      \le q_i}$ time units. Therefore, \tasks{} is npm-feasible. 
 
     \emph{Reverse Direction} (${\exists}$ a posterior task set
     ${\tasks{}~|~\tasks{}}$ is npm-feasible ${\implies}$ \tpj{}
