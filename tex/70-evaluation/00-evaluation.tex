@@ -1,14 +1,15 @@
 \section{Evaluation}\label{sec:eval}
 \renewcommand{\tex}[1]{70-evaluation/#1}
 
-Evaluation of \tpj{} and the non-preemptive multi-threaded task model
-presented in this work focuses on the schedulability ratio of
-synthetic task sets and a case study based upon the evaluation of
-\bundlep{}~\cite{Tessler:2018b}. The ratio of task set specifications
-deemed schedulable by \tpj{} for EDF-NP will be compared to \npchunks{} in
-both limited and fully preemptive settings for EDF. What follows is a 
-description of the parameters to task set specification generation,
-the prescribed evaluation metrics, and analysis of the results.
+Evaluation~\cite{NPM-Artifact:2019} of \tpj{} and the non-preemptive
+multi-threaded task model presented in this work focuses on the
+schedulability ratio of synthetic task sets and a case study based
+upon the evaluation of \bundlep{}~\cite{Tessler:2018b}. The ratio of
+task set specifications deemed schedulable by \tpj{} for EDF-NP will
+be compared to \npchunks{} in both limited and fully preemptive
+settings for EDF. What follows is a description of the parameters to
+task set specification generation, the prescribed evaluation metrics,
+and analysis of the results. 
 
 \subsection{Generating Task Sets}
 
@@ -94,8 +95,8 @@ the evaluation is on the non-preemptive setting. The preemptive
 setting serves as a comparison to alternative scheduling strategies
 and the theoretical best case. For EDF-P, preemptions incur
 \textbf{no} penalty, CRPD or otherwise. In this highly advantageous
-setting for EDF-P, \tpj{} produces feasible task sets \npchunks{}
-deems infeasible in a preemptive setting.
+setting for EDF-P, \tpj{} can still produce feasible non-preemptive task
+sets \npchunks{} deems infeasible in a preemptive setting!
 
 To compare schedulability tests, each task set specification \ants{}
 is provided to \tpj{} without modification under EDF-NP
