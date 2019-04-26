@@ -21,7 +21,7 @@ endef
 
 all: $(TOP)
 
-$(TOP): export TEXINPUTS=../lipics-v2018-authors:
+$(TOP): export TEXINPUTS=../lipics-v2019-authors:
 $(TOP): $(BASE).tex $(BIBS) 80-appendix | $(TMP) plot # Order only target
 	$(PDFLATEX) -output-directory=$(TMP) ./$<
 	TEXMFOUTPUT="$(TMP):" bibtex $(TMP)/$(BASE)

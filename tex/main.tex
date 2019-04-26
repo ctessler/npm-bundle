@@ -1,12 +1,15 @@
-\documentclass[a4paper,USenglish,english]{lipics-v2018}
+\documentclass[a4paper,UKenglish,cleveref,autoref,english]{lipics-v2019}
 %This is a template for producing LIPIcs articles. 
 %See lipics-manual.pdf for further information.
 %for A4 paper format use option "a4paper", for US-letter use option
-%"letterpaper" for british hyphenation rules use option "UKenglish",
-%for american hyphenation rules use option "USenglish" for
-%section-numbered lemmas etc., use "numberwithinsect" 
+%"letterpaper" 
+%for british hyphenation rules use option "UKenglish", for american
+%hyphenation rules use option "USenglish" 
+%for section-numbered lemmas etc., use "numberwithinsect"
+%for enabling cleveref support, use "cleveref"
+%for enabling cleveref support, use "autoref"
 
-\usepackage{microtype}%if unwanted, comment out or use option "draft"
+%helpful if your graphic files are in another directory
 \graphicspath{
   {../svg/}
   {./plot/UFS-alg/}
@@ -15,89 +18,84 @@
   {../aux}
   {./aux}
 }
-\bibliographystyle{plainurl}
+
+\bibliographystyle{plainurl}% the mandatory bibstyle
+
 \title{\texttt{NPM-BUNDLE}: Non-Preemptive Multitask Scheduling for
   Jobs with \texttt{BUNDLE}-based Thread-Level Scheduling}
 
-% optional, please use if title is longer than one line
-\titlerunning{\texttt{NM-BUNDLE}}
+%optional, please use if title is longer than one line
+\titlerunning{\texttt{NPM-BUNDLE}: Non-Preemptive Multitask \texttt{BUNDLE}}
 
 \author{Corey Tessler}
        {Wayne State University, Detroit, Michigan, United States}
        {corey.tessler@wayne.edu}
        {}
-%       {https://orcid.org/...}
        {}
 
 \author{Nathan Fisher}
        {Wayne State University, Detroit, Michigan, United States}
        {fishern@wayne.edu}
        {}
-%       {https://orcid.org/...}
        {}
 
-% mandatory. First: Use abbreviated first/middle names. Second (only in
-% severe cases): Use first author plus 'et al.'
+%TODO mandatory. First: Use abbreviated first/middle names. Second
+%(only in severe cases): Use first author plus 'et al.'        
 \authorrunning{C. Tessler and N. Fisher}
 
-% mandatory, please use full first names. LIPIcs license is "CC-BY";
-% http://creativecommons.org/licenses/by/3.0/ 
+%TODO mandatory, please use full first names. LIPIcs license is
+%"CC-BY";  http://creativecommons.org/licenses/by/3.0/ 
 \Copyright{Corey Tessler and Nathan Fisher}
 
-% mandatory: Please choose ACM 2012 classifications from
-% https://www.acm.org/publications/class-2012 or
-% https://dl.acm.org/ccs/ccs_flat.cfm . E.g., cite as "General and
-% reference $\rightarrow$ General literature" or \ccsdesc[100]{General
-% and reference~General literature}. 
-\subjclass{
-  Computer systems organization $\rightarrow$ Real-time systems,
-  Software and its engineering ${\rightarrow}$ Software functional
-  properties ${\rightarrow}$ Real-time schedulability
-}
+%TODO mandatory: Please choose ACM 2012 classifications from
+%https://dl.acm.org/ccs/ccs_flat.cfm
+\ccsdesc{Computer systems organization~Real-time systems}
+\ccsdesc{Software and its engineering~Real-time schedulability}
 
-% mandatory
-\keywords{Scheduling algorithms, Cache Memory, Multi-threading, Static
-  Analysis}
+%TODO mandatory; please add comma-separated list of keywords
+\keywords{Scheduling algorithms, Cache Memory, Multi-threading,
+  Static Analysis}
 
-% optional, e.g. invited paper
+%optional, e.g. invited paper
 \category{}
 
-% optional, e.g. full version hosted on arXiv, HAL, or other
-% respository/website 
+%optional, e.g. full version hosted on arXiv, HAL, or other
+%respository/website \relatedversion{A full version of the paper is
+%available at %\url{...}.} 
 \relatedversion{}
 
-% optional, e.g. related research data, source code, ... hosted on a
-% repository like zenodo, figshare, GitHub, ... 
+%optional, e.g. related research data, source code, ... hosted on a
+%repository like zenodo, figshare, GitHub, ...
 \supplement{}
 
-% optional, to capture a funding statement, which applies to all
-% authors. Please enter author specific funding statements as fifth
-% argument of the \author macro.
-\funding{}
+%\funding{(Optional) general funding statement \dots}%optional, to
+%capture a funding statement, which applies to all authors. Please
+%enter author specific funding statements as fifth argument of the
+%\author macro.
+\funding{The research presented in this paper was supported
+  by the National Science Foundation under Grant Nos. CNS-1618185 and
+  IIS-1724227.}
 
-% optional
-\acknowledgements{}
+\nolinenumbers %uncomment to disable line numbering
 
-%Editor-only macros:: begin (do not touch as author)%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\EventEditors{John Q. Open and Joan R. Access}
-\EventNoEds{2}
-\EventLongTitle{42nd Conference on Very Important Topics (CVIT 2016)}
-\EventShortTitle{CVIT 2016}
-\EventAcronym{CVIT}
-\EventYear{2016}
-\EventDate{December 24--27, 2016}
-\EventLocation{Little Whinging, United Kingdom}
+%\hideLIPIcs  %uncomment to remove references to LIPIcs series (logo,
+%DOI, ...), e.g. when preparing a pre-final version to be uploaded to
+%arXiv or another public repository 
+
+%Editor-only macros:: begin (do not touch as%author) %%
+\EventEditors{Sophie Quinton}
+\EventNoEds{1}
+\EventLongTitle{31st Euromicro Conference on Real-Time Systems (ECRTS 2019)}
+\EventShortTitle{ECRTS 2019}
+\EventAcronym{ECRTS}
+\EventYear{2019}
+\EventDate{July 9--12, 2019}
+\EventLocation{Stuttgart, Germany}
 \EventLogo{}
-\SeriesVolume{42}
-\ArticleNo{23}
-% uncomment to disable line numbering
-\nolinenumbers
+\SeriesVolume{133}
+\ArticleNo{19}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% uncomment to remove references to LIPIcs series (logo, DOI, ...),
-% e.g. when preparing a pre-final version to be uploaded to arXiv or
-% another public repository 
-%\hideLIPIcs
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Packages not supplied by LIPICS
@@ -113,13 +111,8 @@
 % \usepackage{multirow} % For entries spanning multiple rows in tables
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\newtheorem{prop}{Property}	% Properties
+\newtheorem{prop}{Property}
 \DeclareMathOperator{\argmax}{argmax}
-
-% Caption spacing is egregious
-% \setlength{\intextsep}{0pt}
-% \setlength{\floatsep}{0pt}
-% \setlength{\textfloatsep}{0pt}
 
 \addtolength{\parskip}{-0.5mm}
 \setlength{\textfloatsep}{0.1cm}
@@ -127,12 +120,11 @@
 \captionsetup{skip=4pt}
 \setlength{\belowcaptionskip}{1pt}
 
-\newcommand{\needed}{\text{\color{red}\emph{citation needed}}}
 \newcommand{\bundlep}{\texttt{BUNDLEP}}
 \newcommand{\bundle}{\texttt{BUNDLE}}
 
-\begin{document}
 
+\begin{document}
 \maketitle
 
 \input{notation.tex}
@@ -141,18 +133,8 @@
 \input{15-related-work/00-related.tex}
 \input{20-model/00-model.tex}
 \input{30-schedulability/00-schedulability.tex}
-% \input{40-growth-bundle/00-growth-bundle.tex}
 \input{70-evaluation/00-evaluation.tex}
 \input{75-conclusion/00-conclusion.tex}
 
-%%
-%% Bibliography (using bibtex)
-%%
-\section{Acknowledgments}
-
-The research presented in this paper was supported by the National
-Science Foundation under Grant Nos. CNS-1618185 and IIS-1724227.
-
 \bibliography{main}
-
 \end{document}
