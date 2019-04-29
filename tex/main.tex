@@ -213,8 +213,43 @@
 % end override
 %
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Abstract
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{abstract}
 
-\input{00-abstract/00-abstract.tex}
+  The \bundle{} and \bundlep{} scheduling algorithms are cache-cognizant
+  thread-level scheduling algorithms and associated worst case
+  execution time and cache overhead (WCETO) techniques for hard
+  real-time multi-threaded tasks. The \texttt{BUNDLE}-based approaches
+  utilize the inter-thread cache benefit to reduce WCETO values for 
+  jobs. Currently, the \texttt{BUNDLE}-based approaches are limited to
+  scheduling a single task. This work aims to expand the applicability
+  of \texttt{BUNDLE}-based scheduling to multiple task multi-threaded
+  task sets.
+
+  \texttt{BUNDLE}-based scheduling leverages knowledge of potential
+  cache conflicts to selectively preempt one thread in favor of
+  another from the same job. This thread-level preemption is a
+  requirement for the run-time behavior and WCETO calculation to
+  receive the benefit of \texttt{BUNDLE}-based approaches. This work
+  proposes scheduling \texttt{BUNDLE}-based jobs non-preemptively
+  according to the earliest deadline first (EDF) policy. Jobs are
+  forbidden from preempting one another, while threads within a job
+  are allowed to preempt other threads.
+
+  An accompanying schedulability test is provided, named Threads Per
+  Job (\tpj{}). \tpj{} is a novel schedulability test, input is a task
+  set specification which may be transformed (under certain
+  restrictions); dividing threads among tasks in an effort to find
+  a feasible task set. Enhanced by the flexibility to transform task
+  sets and taking advantage of the inter-thread cache benefit, the
+  evaluation shows \tpj{} scheduling task sets fully preemptive EDF
+  cannot. 
+  
+\end{abstract}
+
+
 \input{10-intro/00-intro.tex}
 \input{15-related-work/00-related.tex}
 \input{20-model/00-model.tex}
