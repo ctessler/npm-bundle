@@ -325,10 +325,117 @@ feasibility. Section~\ref{sec:eval} compares the schedulability ratio
 of \tpj{} to other non-preemptive and preemptive scheduling
 algorithms, before concluding with Section~\ref{sec:conclusion}. 
 
-  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Related Work
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Discussion of Related Research}
+\label{sec:related}
+
+\noindent
+{\bf Single-Threaded Tasks:}  The challenge of dealing with the
+non-uniformity of execution times in real-time systems due to cache
+misses or hits has received considerable attention~\cite{Wilhelm:2008,Theiling:2000}. In
+particular, much of the 
+prior real-time systems work on understanding caches vis-\`{a}-vis scheduling has focused upon the contention in the
+cache due to tasks preempting each other.  Roughly speaking, a large
+majority of this research can be classified into two categories:
+\emph{cache-related preemption delay (CRPD) analysis} and
+\emph{deferred/limited-preemption scheduling}. 
+The goal of CRPD analysis is to bound the number of cache blocks of a
+task that need to be reloaded due to evictions caused by a preempting
+task.  The foundation of CRPD analysis is the development of
+techniques for counting and bounding the number of blocks affected by
+preemption; this is achieved by categorizing a task's cache blocks
+into sets of useful cache blocks (UCBs) or evicting cache block
+(ECBs)~\cite{Lee:1998,Tomiyama:2000}.  The size of these sets can be
+used as an upper bound on the cache cost of a preemption.  Subsequent
+research based upon this UCB and ECB categorization has refined these
+sets and incorporated the CRPD analysis into schedulability
+analysis~\cite{Altmeyer:2012,Altmeyer:2011,Altmeyer:2011b,Negi:2003,
+  Staschulat:2005, Tan:2004}. 
+However, please note that these CRPD approaches only quantify the
+cache effect of preemption into existing scheduling approaches and do not
+change any scheduling decision based upon the knowledge of
+preemption. 
+
+In limited/deferred-preemption scheduling, a higher-priority task may
+preempt a lower-priority task only when some condition is satisfied.
+The overall effect of deferring or limiting preemptions is to reduce
+the number of times a task may be preempted during its execution.  The
+hope is that by limiting the number of preemptions this will lead to a
+decrease in the execution time of job due to the cache overhead of
+preemption.  Different conditions for deferring preemptions have been
+considered.  The fixed preemption-point approach~\cite{Burns:1995}
+selects specific locations in a task code that are most appropriate
+for the program but preserve the system schedulability.  The
+preemption-threshold scheduling approach~\cite{Wang:1999} sets a
+threshold that only task with higher-priority than this threshold may
+preempt a currently-executing lower priority task.  The floating
+preemption-point model~\cite{Baruah:2005,Marinho:2012} computes the
+maximum time duration that a lower-priority task may delay the
+preemption of a higher-priority task.  Each of the deferred preemption
+approaches have been shown to limit the number of preemptions but do
+not incorporate the CRPD overhead cost in its decision on how to defer
+preemption. 
+
+More recently, a line of research has emerged to combine the aspects
+of CRPD analysis and limited/deferred preemption scheduling by
+explicitly placing preemption points in the code to minimize CRPD
+effects.  Early heuristics were proposed by Simonson and
+Patel~\cite{Simonson:1995} and Lee et al.~\cite{Lee:1998}.  Bril et
+al.~\cite{Bril:2017} integrated CRPD analysis into preemption-threshold
+scheduling.  Bertogna et al.~\cite{Bertogna:2011} provide a more formal
+approach for optimally determining preemptions in programs that can be
+represented by linear control flowgraphs given the CRPD overhead of
+each preemption and a bound on the maximum non-preemption
+region~\cite{Baruah:2005}. Later work, extended this to more general
+control flowgraphs~\cite{Peng:2014} or more precise CRPD
+characterizations of the preemption costs~\cite{Cavicchio:2015}.
+However, all of this aforementioned research assumes each task is
+single-threaded.  The techniques proposed in this paper extend
+the CRPD and limited preemption concepts to scheduling multi-threaded
+tasks by combining and extending the limited-preemption scheduling
+results of Baruah~\cite{Baruah:2005} to the cache-cognizant
+thread-level scheduling algorithms that minimize cache contention
+between threads called \bundle{}~\cite{Tessler:2016} and
+\bundlep{}~\cite{Tessler:2018}.
 
 
-\input{15-related-work/00-related.tex}
+\noindent
+\textbf{Multi-Threaded Tasks:} Cache interference amplifies 
+the variation in execution times of multi-threaded task sets. Threads
+of the same task share cache locations, with the potential to increase
+misses and hits depending on the order of execution of
+threads. This variability is an addition to the variation already
+present when considering CRPD with other tasks.
+
+  There are few works we are aware which directly address the
+inter-thread variability due to caches in multi-threaded task
+sets. The approaches focus on isolating execution or managing cache
+behavior. Memory-Centric Scheduling~\cite{Bak:2012} isolates
+contentious execution by scheduling tasks according to their cache
+behavior. To create such isolation, tasks must be
+PREM-compliant~\cite{Pellizzoni:2011}, with distinct load and
+execution phases. Cache management utilize techniques that limit the
+contention in the cache, such as coloring and blocking found
+in~\cite{Ward:2013}. These approaches come at a cost of modified or
+restricted executable objects, reduced cache sizes, or additional
+cache misses of blocked lines. Yet, with these limitations, the
+inter-thread variability is not accounted for within multi-threaded
+tasks. 
+
+\bundle{}~\cite{Tessler:2016} and \bundlep{}~\cite{Tessler:2018}
+address inter-thread variability due to cache interactions. These
+\texttt{BUNDLE}-based approaches analyze executable object coupled
+with a cache-cognizant thread-level scheduling algorithm without the
+added detriment of modified (or restricted) objects, or cache
+management penalties. We are not aware of any other technique that
+addresses inter-thread variability, with the execption of
+Calandrino's~\cite{Calandrino:2009} limited cache spread. However, the
+results of~\cite{Calandrino:2009} are strictly empirical.
+
+
+
 \input{20-model/00-model.tex}
 \input{30-schedulability/00-schedulability.tex}
 \input{70-evaluation/00-evaluation.tex}
