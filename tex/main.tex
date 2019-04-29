@@ -123,11 +123,97 @@
 \newcommand{\bundlep}{\texttt{BUNDLEP}}
 \newcommand{\bundle}{\texttt{BUNDLE}}
 
-
 \begin{document}
 \maketitle
 
-\input{notation.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Macros and Notation
+% Macros for commonly used symbols and functions to ensure that their
+% use remains consistent.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Block Reload Time - \BRT
+\newcommand{\BRT}{\ensuremath{\mathbb{B}}}
+% Cycles Per Instruction - \CPI
+\newcommand{\CPI}{\ensuremath{\mathbb{I}}}
+% Task Set - \tasks
+\newcommand{\tasks}{\ensuremath{\tau}}
+% Individual Task - \task{n}
+\newcommand{\task}[1]{\ensuremath{\tau_{#1}}}
+% Minimum inter-arrival time - \period{n}
+\newcommand{\period}[1]{\ensuremath{p_{#1}}}
+% Relative deadline - \deadline{n}
+\newcommand{\deadline}[1]{\ensuremath{d_{#1}}}
+% Absolute deadline - \Deadline{n}
+\newcommand{\Deadline}[1]{\ensuremath{D_{#1}}}
+% Number of threads released with each job of task n - \taskthreads{n}
+\newcommand{\taskthreads}[1]{\ensuremath{m_{#1}}}
+% WCET - \wcet{n}{m}
+%    n - task number
+%    m - number of threads
+\newcommand{\wcet}[2]{\ensuremath{c_{#1}{(#2)}}}
+% Object of execution - \object{i}
+\newcommand{\object}[1]{\ensuremath{o_{#1}}}
+% SLACK - \slack{${D_i}$}
+\newcommand{\slack}[1]{\text{\sc{slack}(#1)}}
+% DBF - \dbf{\tau_i}{\Deadline{k}}
+\newcommand{\dbf}[2]{\text{\sc{dbf}(#1,#2)}}
+% Hyper Period - \hp
+\newcommand{\hp}{\ensuremath{P}}
+
+% Superior indicator  - \supp{\tasks{}}
+\newcommand{\supi}[1]{\ensuremath{\hat{#1}}}
+% Superior Task Set - \supset
+\newcommand{\supts}{\ensuremath{\hat{\tau}}}
+% Anterior Task Set - \ants
+\newcommand{\ants}{\ensuremath{\hat{\tau}}}
+% Anterior task - \ant{i}
+\newcommand{\ant}[1]{\ensuremath{\hat{\task{}}_#1}}
+
+% Maximum Period and Relative Deadline Difference -
+\newcommand{\pd}{\ensuremath{\Delta_{max}}}
+% DIVIDE procedure \algdivide{t}{q}
+%    t - the task
+%    q - non preemptive chunk size
+%    \algdivide{\task{i}}{q}
+\newcommand{\algdivide}[2]{\text{\sc{divide}(#1,#2)}}
+% DIVIDE as a name
+\newcommand{\texdivide}{\text{\sc{divide}}}
+% Partial tasks
+%    i - the task being divided
+%
+\newcommand{\Partial}[1]{\ensuremath{\Phi_{#1}}}
+
+% Growth Factor
+\newcommand{\GFactor}{\ensuremath{\mathbb{F}}}
+
+% NP-CHUNKS
+\newcommand{\npchunks}{\text{\sc{np-chunks}}}
+% BNG
+\newcommand{\bng}{\text{\sc{bnc}}}
+% TPJ
+\newcommand{\tpj}{\text{\sc{tpj}}}
+
+% S values
+\newcommand{\stpj}{\ensuremath{s^{\text{\sc{tpj}}}}}
+
+%
+% To be overridden by over-one.tex
+% 
+\newcommand{\totalTaskSets}{-}
+% Total number of task sets when \tau^1 utilization > 1
+\newcommand{\totalOverOne}{-}
+% Total number of OverOne task sets TPJ could schedule
+\newcommand{\totalOOTPJ}{-}
+% OverOne Ratio
+\newcommand{\ratioOverOne}{-}
+% TPJ ratio
+\newcommand{\ratioOOTPJ}{-}
+%
+% end override
+%
+
+
 \input{00-abstract/00-abstract.tex}
 \input{10-intro/00-intro.tex}
 \input{15-related-work/00-related.tex}
