@@ -710,15 +710,1250 @@ increases ${c_i(m)}$ by ${\GFactor{} \cdot c_i(1)}$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Non-Preemptive Schedulability
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Non-Preemptive EDF Schedulability}
+\label{sec:schedulability}
+
+Preemptive earliest deadline first (EDF) schedulability analysis for
+sporadic task sets has been well
+studied~\cite{Liu:1973,Baruah:1990,George:1996}. In the fully 
+preemptive setting for which the algorithm is optimal, the
+overhead of a large number of preemptions may be a detriment to
+schedulability. Baruah~\cite{Baruah:2005} addresses this concern with
+an algorithm for calculating the non-preemptive chunk size ${q_i}$ of
+each task ${\task{i} \in \tasks}$. The non-preemptive chunk size
+${q_i}$ guarantees that task \task{i} may execute up to ${q_i}$ time
+units non-preemptively without introducing a deadline miss for any
+task in \tasks{} scheduled by preemptive EDF.
+
+Section~\ref{sec:tpj} introduces the non-preemptive feasibility algorithm
+Thread Per Job (\tpj) based upon the non-preemptive chunks algorithm
+from~\cite{Baruah:2005}. \tpj{} differs from the non-preemptive chunks
+algorithm by requiring the non-preemptive chunk size ${q_i}$ of each
+task \task{i} to be greater than or equal to its WCET: ${c_i(m_i) \le
+  q_i}$. As such, all jobs can be scheduled non-preemptively without
+fear of a deadline miss. To clearly convey \tpj{}, a description of
+the non-preemptive chunks algorithm and its dependencies is provided
+in the immediate subsection. Subsection~\ref{sec:improve-np-chunk}
+describes, by example, the available improvements to the
+non-preemptive chunks algorithm~\cite{Baruah:2005}.
+Subsection~\ref{sec:feasibility} defines and proves \tpj{}'s
+optimality.
+
+\subsection{Non-Preemptive Chunks}
+
+The non-preemptive chunks algorithm depends on the demand bound
+function, EDF feasibility, ordering of absolute deadlines, and slack
+for the task set ${\tasks}$. Ordered absolute deadlines are given by
+${\{\Deadline{1}, \Deadline{2},   ... \}}$ with ${D_n < D_{n+1}}$
+for all ${n}$, where each task ${\task{i} \in \tasks}$ contributes
+deadlines ${D = k \cdot p_i + d_i}$ for ${k \in \mathbb{Z}^+}$. 
+
+For a sporadic task \task{i} the demand bound function for a task
+\dbf{\task{i}}{${t}$} is an upper bound on the amount of execution
+requirement generated from jobs released by \task{i} over ${t}$ units
+of time. The demand bound function is presented as
+Equation~\ref{eq:dbf} as \dbf{\task{i}}{${t}$} modified
+from~\cite{Baruah:1990} to suit the task set model used in this work.
+
+\begin{definition}[Demand Bound Function for a Task \task{i} and
+    Interval ${t}$]
+  \begin{equation}
+    \label{eq:dbf}
+    \dbf{\task{i}}{${t}$} = \max \left(0,
+      \left( \left\lfloor \frac{t - d_i}{p_i} \right\rfloor + 1
+      \right) \cdot c_i(m_i)
+    \right)
+  \end{equation}
+\end{definition}
+
+When necessary for brevity, Equation~\ref{eq:dbf-sum} will be used to
+represent the sum of demand of all tasks over an interval of length
+${t}$.
+
+\begin{definition}[Demand Bound Function for the Task Set \tasks{} and
+    Interval ${t}$] 
+  \begin{equation}
+    \label{eq:dbf-sum}
+    \dbf{\tasks{}}{$t$} = \sum_{\task{i} \in \tasks} \dbf{\task{i}}{$t$}
+  \end{equation}
+\end{definition}
 
 
+Slack of the task set \tasks{} at deadline \Deadline{k} is given by
+Equation~\ref{eq:slack}. Intuitively, slack is the minimum time the
+processor will be idle over an interval. It is the difference between
+the demand over the interval and the length of the interval.
 
-\input{30-schedulability/00-schedulability.tex}
+\begin{definition}[Slack at Deadline ${D_k}$]
+  \begin{equation}
+    \label{eq:slack}
+    \slack{${D_k}$} = \min_{j \le k}
+      \left( D_j - \sum_{\task{i} \in \tasks} \dbf{\task{i}}{\Deadline{k}}
+      \right)
+  \end{equation}
+\end{definition}
 
-% end current
+For EDF, feasibility is determined by examining increasing time
+intervals and calculating the demand and supply. If demand exceeds
+supply, the system is infeasible. Equation~\ref{eq:dbf-set} provides a
+formal definition of feasibility for the task set \tasks{}.
+
+\begin{definition}[EDF Feasibility Demand Bound Test]
+  \begin{equation}
+    \label{eq:dbf-set}
+      \forall t \ge 0, 
+      \left(
+        \sum_{\task{i} \in \tasks{}} \dbf{\task{i}}{$t$}
+      \right)
+      \le t
+  \end{equation}
+\end{definition}
+
+In~\cite{Baruah:2005}, the number of time instants tested by
+Equation~\ref{eq:dbf-set} is limited to the values of the ordered set
+of absolute deadlines ${\{D_1, D_2, ... \}}$. The ordered set of
+absolute deadlines is an infinite set, impractical for feasibility
+test. There is an upper bound on the value of all time instants
+(absolute deadlines) that must be tested and is denoted
+${T^*(\tasks{})}$. Taken from~\cite{George:1996}, ${T^*(\tasks{})}$ is given by
+Equation~\ref{eq:t-star} below. Among all tasks the largest deadline
+is ${d_{\text{max}} = \max_{\task{j} \in \tasks}(d_j)}$. Utilization of \task{j} is defined as ${U_j =
+  \frac{c_j(m_j)}{p_j}}$. Among all tasks, the greatest difference of
+period and deadline is given by ${\pd = \max_{\tau_i \in \tau}(p_i -
+  d_i )}$.  The hyper-period of all tasks (the least common multiple
+of all relative deadlines) is given by ${P}$.
+
+\begin{definition}[Feasibility Test Bound ${t}$ for \tasks{}] 
+  \begin{equation}\label{eq:t-star}
+    T^*(\tasks{}) = \min \left(P,
+    \max \left(
+    d_{\text{max}}, \frac{1}{1 - U}
+    \cdot \pd \cdot
+    \sum_{i=0}^{n-1} U_i
+    \right)
+    \right)
+  \end{equation}
+\end{definition}
+
+The non-preemptive chunks algorithm from~\cite{Baruah:2005} is
+presented (with additional details) as pseudocode in
+Algorithm~\ref{alg:np-chunks} and named \npchunks{}. In addition to
+determining if the task set is schedulable under EDF, the algorithm
+produces a non-preemptive chunk size ${q_j}$ for each task ${\task{j}
+  \in \tasks}$. Jobs of \task{j} may execute up to ${q_j}$ time units
+non-preemptively without negatively impacting schedulability. This
+setting, where a task \task{j} may execute non-preemptively for some
+period of time ${q_j}$ is referred to as \emph{limited-preemption}. 
+
+\begin{algorithm}[H]
+  \caption{Non-Preemptive Chunks (\npchunks{})}\label{alg:np-chunks}
+  \begin{algorithmic}[1]
+    \State \slack{\Deadline{1}} ${\gets \Deadline{1} - \sum_{\task{i}
+        \in \tasks{}}\dbf{\task{i}}{\Deadline{1}}}$ \label{line:D1}
+    \For {${\task{j} \in \{\task{i} \in \tasks{} ~|~ (d_i = D_1)\}}$}
+    \label{line:npchunks-init-start}
+        \State ${q_j \gets c_j(m_j)}$
+    \EndFor
+    \label{line:npchunks-init-end}        
+    \For{${k \in \{D_2, D_3, ..., \}}$}
+      \If{${D_k > T^*(\tasks)}$}
+        \State return \emph{feasible}
+      \EndIf
+      \State \slack{${D_k}$} ${\gets \min
+        \left(
+          \slack{${D_{k-1}}$}, D_k - \sum_{\task{i} \in \tasks}
+          \dbf{\task{i}}{${D_k}$} \label{line:slackDk}
+        \right)
+        }$
+      \If{\slack{${D_k}$} ${< 0}$}
+        \State return \emph{infeasible}
+      \EndIf
+      \For {${\task{j} \in \{\task{i} \in \tasks{} ~|~ (d_i = D_k)\}}$}
+          \State ${q_j \gets \slack{${D_k}$}}$
+      \EndFor
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
+
+For a detailed description of \npchunks{} refer
+to~\cite{Baruah:2005}. To summarize, \npchunks{} begins by seeding the
+slack of the smallest interval ${D_1}$ and the non-preemptive chunk
+size of tasks with the smallest relative deadline equal to their
+WCET. During each iteration of ${D_k \in \{D_2, D_3, ..., \}}$, the
+slack for the interval ${D_k}$ is calculated as the minimum of the
+current slack and the previous slack value. If there is less than zero
+slack, the system is infeasible. If the slack is zero or greater, each
+task with relative deadline equal to the current interval size is
+assigned the available slack as the task's non-preemptive chunk
+size. A task ${\task{j}}$ is assigned a non-preemptive chunk once,
+before assignment ${q_j = \varnothing}$ afterwards ${q_j \not = 
+  \varnothing}$. If the interval being examined ${D_k}$ exceeds
+${T^*(\tasks{})}$, the task set must be schedulable.  
+
+\subsection{Improving the Non-Preemptive Chunk Size}
+\label{sec:improve-np-chunk}
+
+From the description of \npchunks{} in~\cite{Baruah:2005}, there is
+an opportunity to improve the available slack for each of the ${k}$
+deadlines considered. Alogrithm~\ref{alg:np-chunks} is pessimistic in
+the amount of available slack at any deadline ${D_k}$. To illustrate,
+consider the task set and intermediate values described by
+Figure~\ref{fig:exbad}. 
+
+\begin{figure}[H]
+  \begin{tabular}{cc}
+    \begin{tabular}{|c|c|c|c|c|}
+      \hline
+      ${i}$ & \period{i} & \deadline{i} & \taskthreads{i} &
+      \wcet{i}{\taskthreads{i}} \\
+      \hline
+      \task{0} & 4 & 2 & 1 & 1 \\
+      \task{1} & 3 & 3 & 1 & 1 \\
+      \task{2} & 3 & 3 & 1 & 1 \\
+      \hline
+    \end{tabular}
+    &
+    \begin{tabular}{|c||c|c|c|c||c|}
+      \hline
+      \hp & \Deadline{k} & ${\task{j}: d_j = D_k}$ & \dbf{\tasks}{\Deadline{i}}
+      & \slack{\Deadline{i}} & ${q_j}$\\
+      \hline
+      \multirow{3}{*}{12}
+      & \Deadline{1} = 2 & \task{0} & 1 & 1 & 1\\
+      \cline{2-6}
+      & \multirow{2}{*}{\Deadline{2} = 3} & \task{1} & 3 & 0 & \textbf{0}\\
+      & & \task{2} & 3 & 0 & \textbf{0}\\      
+      \hline
+    \end{tabular}
+  \end{tabular}
+  \caption{Example Task Set ${\tasks{} = \{ \task{0}, \task{1}, \task{2} \}}$}
+  \label{fig:exbad}
+\end{figure}
+
+There are three tasks in the task set of Figure~\ref{fig:exbad}, with 
+utilization of approximately 0.92. For \task{0}, initialization
+assigns a non-preemptive chunk of ${q_0 = 1}$ time units. By
+observation, after release \task{0} may be delayed from execution by
+at most one time unit or it will miss its deadline. Consequently, the
+non-preemptive chunk size available to \task{1} and \task{2} is 1. As
+such \npchunks{} would be expected to find ${q_0 = 1, q_1 = 1, q_2 =1}$.
+
+Note, it is not possible for \task{0} to be blocked for 1
+or more time units if both \task{1} and \task{2} execute
+non-preemptively for 1 time unit each. If \task{0} is blocked for less
+than 1 time unit by \task{1}, then \task{0} will be the highest
+priority task when \task{1} completes (similarly for \task{2}). It is
+impossible for \task{0} to be blocked 1 time unit or more by \task{1}
+or \task{2}, \task{0} would have to be released at the same time
+instant as \task{1} or \task{2} and \task{1} or \task{2} would have to
+execute before \task{0}, since the relative deadline of \task{0} is
+less than the other two, limited-preemption EDF executes \task{0}: the
+task with earliest absolute deadline.
+
+For \task{0}, ${q_0}$ is calculated as expected
+${q_0 = c_0(m_0) = 1}$, by
+Lines~\ref{line:npchunks-init-start}-\ref{line:npchunks-init-end} of
+Algorithm~\ref{alg:np-chunks}. However, \task{1} has a non-preemptive
+chunk size of ${q_1 = 0}$. The reason is Line~\ref{line:slackDk},
+where \slack{\Deadline{2}} is calculated which includes the execution
+demand of \task{1} and \task{2}. Slack is an upper bound on
+the non-preemptive chunk size assigned to a task (in this case
+\task{1}). Giving a task the available slack permits the task to
+execute longer, delaying higher priority jobs from executing in the
+interval by delaying them for as much time as there is slack.
+
+By example in Figure~\ref{fig:exbad}, the available slack for \task{1}
+is determined from the interval of length \Deadline{2} = 3. The
+execution requirement of \task{1} and \task{2} is included
+in \dbf{\tasks{}}{3} because ${\deadline{1} = \deadline{2} = 3}$. Thus
+\slack{\Deadline{2}} is zero. Since \task{1}'s execution requirement
+is already included, it cannot 
+further interfere over the interval \Deadline{2}. Furthermore,
+\task{1} must have executed some portion without being preempted or
+the system would not be schedulable. Inclusion of \task{1}'s execution
+requirement within the interval over which slack is calculated for is
+pessimistic with respect to the non-preemptive chunk ${q_1}$ in this
+specific example, and ${q_j}$ in general.
 
 
-\input{70-evaluation/00-evaluation.tex}
+In the pseudocode implementation of \npchunks{} adopted
+from~\cite{Baruah:2005}, Line~\ref{line:slackDk} calculates the
+non-preemptive chunk size according Equation~\ref{eq:baruah-07}
+(Equation 7 of Theorem 1 in~\cite{Baruah:2005}). Comparing
+Line~\ref{line:slackDk} of Algorithm~\ref{alg:np-chunks} to
+Equation~\ref{eq:baruah-07} a mismatch between the algorithm and the
+infeasibility test is illuminated. 
+
+\begin{definition}[Infeasibility Test, Equation 7, from~\cite{Baruah:2005}]
+\begin{equation}
+  \exists \task{j} \in \tasks{}, t \in [0, d_j) ~|~ t < q_j +
+    \sum_{\substack{{i=0}\\{i \not = j}}}^{n - 1}
+    \dbf{\task{i}}{$t$}
+    \label{eq:baruah-07}
+\end{equation}
+\end{definition}
+
+If the condition of Equation~\ref{eq:baruah-07} is
+satisfied for a task set \tasks{}, the task set is unschedulable given
+a limited-preemption task set with assigned non-preemptive chunks
+${q}$. The interval considered in the demand of
+Equation~\ref{eq:baruah-07} is over ${[0,d_j)}$. The demand used in 
+Algorithm~\ref{alg:np-chunks} to calculate ${q_j}$ is over the
+interval ${[0, d_j]}$. Extending the interval to include ${d_j}$
+introduces the pessimism identified by the example and is not required
+by Equation~\ref{eq:baruah-07}.
+
+Figure~\ref{fig:exbad} illustrates the pessimism of
+\npchunks{} found in~\cite{Baruah:2005}. The
+example uses the notation of assigning non-preemptive chunks to
+individual tasks from~\cite{Baruah:2005}. A 
+later work~\cite{Bertogna:2010} uses a different notation,
+assigning non-preemptive chunks to interval lengths for the remaining
+execution of a job. The conceptual pessimism of including demand for
+tasks with deadline equal to the current interval (described by
+Figure~\ref{fig:exbad}) is also found in~\cite{Bertogna:2010}. 
+
+
+\subsection{Threads per Job (\tpj{}) Scheduling Algorithm}
+\label{sec:tpj}
+
+In this work, the \npchunks{} algorithm is modified for several
+purposes. First, the unnecessary pessimism is removed from chunk
+calculations. Second, the schedulability test is adapted to the model
+used herein. Lastly, when a given assignment of tasks and threads are
+infeasible, tasks are divided (when possible) to fit into their
+chunks. The division process is repeated until the task set is
+feasible, or no possible divisions remain and the task set is reported
+as infeasible. The algorithm is named the \emph{Threads Per Job} (\tpj{})
+scheduling algorithm.
+
+A full description of \tpj{} is presented at the end of this
+subsection. To reach the complete description, an intermediate
+algorithm named \emph{Bigger Non-Preemptive Chunks} (\bng{}) is presented
+as pseudocode in Algorithm~\ref{alg:bng}. \bng{} removes the
+pessimism described in Section~\ref{sec:improve-np-chunk}. The
+algorithm takes advantage of a property of the demand function 
+\dbf{\tasks{}}{$t$} noted in~\cite{Baruah:2005}. 
+
+\begin{prop}[Demand Change]\label{prop:dmnd}
+Demand for a task does not change for values of ${t}$ that do not
+equal an absolute deadline. In terms of the set of ordered absolute
+deadlines,
+${\dbf{\tasks{}}{\Deadline{i-1}} =
+  \dbf{\tasks{}}{\Deadline{i}${ - \epsilon}$}}$, for
+${0 < \epsilon \le (\Deadline{i} - \Deadline{i-1})}$.
+\end{prop}
+
+\begin{algorithm}[h]
+  \caption{Bigger Non-Preemptive Chunks (\bng{})}\label{alg:bng}
+  \begin{algorithmic}[1]
+    \State \slack{\Deadline{0}} ${\gets \infty}$
+    \For{${k \in \{D_1, D_2, D_3, ..., \}}$}
+      \If{${D_k > T^*(\tasks)}$}
+        \State return \emph{feasible}
+      \EndIf
+      \State \slack{${D_k}$} ${\gets \min
+        \left(
+          \slack{${D_{k-1}}$}, D_k - \sum_{\task{i} \in \tasks}
+          \dbf{\task{i}}{${D_k}$}
+        \right)
+        }$
+      \If{\slack{${D_k}$} ${< 0}$}
+        \State return \emph{infeasible}
+      \EndIf
+      \For {${\task{j} \in \{\task{i} \in \tasks{} ~|~ (d_i = D_k)\}}$}
+          \State ${q_j \gets \min(c_j(m_j), \slack{${D_{k-1}}$)}}$
+          \label{line:bng-improvement}
+      \EndFor
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
+
+Line~\ref{line:bng-improvement} of Algorithm~\ref{alg:bng} implements
+the improvement of \bng{} over \npchunks{}. The non-preemptive chunk 
+${q_j}$ of task \task{j} is taken from the slack of the previous
+interval ${D_{k-1}}$ or the task's WCET ${c_j(m_j)}$, whichever is
+smaller. The algorithm verifies the condition set by
+Equation~\ref{eq:baruah-07}, selecting the correct interval
+length by Property~\ref{prop:dmnd}, which precludes the inclusion of
+\task{j}'s execution requirement in the interval (and other tasks with
+deadline \Deadline{k}).
+
+\begin{algorithm}[ht]
+  \caption{Threads-Per-Job (\tpj{})}\label{alg:tpj}
+  \begin{algorithmic}[1]
+    \State \slack{\Deadline{0}} ${\gets \infty}$
+    \For{${k \in \{D_1, D_2, D_3, ..., \}}$} \label{line:begin-for}
+      \If{${D_k > T^*(\tasks)}$} \label{line:infeasible-1}
+        \State return \emph{feasible}
+      \EndIf
+ 
+      \For {${\ant{j} \in \{\task{i} \in \tasks{} ~|~ (d_i = D_k)\}}$}      \label{line:bnc-mod-start}
+      \If{${\slack{\Deadline{k-1}} < \hat{c}_j(1)}$}\label{line:minq-start}
+        \State return \emph{infeasible} \label{line:no-slack-infease}
+        \EndIf \label{line:minq-end}
+      \State ${\Partial{j} \gets \{\ant{j}\}}$
+      \If{${\slack{\Deadline{k-1}} < \hat{c}_j(\hat{m}_j)}$}\label{line:rem-p1}
+        \Comment Jobs must be divided
+          \State ${\Partial{j} \gets \algdivide{\ant{j}}{\slack{\Deadline{k-1}}}}$
+          \label{line:divide}
+          \State ${\tasks{} \gets \tasks{} \setminus \ant{j}}$
+          \Comment Anterior task \ant{j} is represented by \Partial{j}
+          \State ${\tasks{} \gets \tasks{} \cup \Partial{j}}$
+          \Comment Partial tasks include all threads of \ant{j}
+      \EndIf \label{line:rem-p2}
+      \For {${\task{j} \in \Partial{j}}$}
+          \State ${q_j \gets \wcet{j}{m_j}}$
+      \EndFor
+      \EndFor \label{line:the-same}
+      \label{line:bnc-mod-end}
+      
+      \State \slack{${D_k}$} ${\gets \min
+        \left(
+          \slack{${D_{k-1}}$}, D_k - \sum_{\task{i} \in \tasks}
+          \dbf{\task{i}}{${D_k}$}
+        \right)
+      }$ \label{line:same-deadline}
+      \If{\slack{${D_k}$} ${< 0}$} \label{line:infeasible-2}
+        \State return \emph{infeasible} \label{line:more-demand}
+      \EndIf
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
+
+The Threads per Job scheduling Algorithm~\ref{alg:tpj}, is a
+modification of \bng{} from limited-preemption EDF (EDF-LP) scheduling to
+non-preemptive EDF (EDF-NP). Input to the schedulability test is a task set
+specification \tasks{}, if \tpj{} returns a \emph{feasibile} result
+there exists a posterior task set which can be scheduled by
+non-preemptive EDF and the posterior task set is
+returned as \tasks{}. An \emph{infeasible} result indicates that
+\tpj{} could not guarantee \tasks{} would be schedulable by EDF-NP for
+any posterior task set. Since non-preemptive EDF is not optimal with
+respect to feasibility~\cite{Buttazzo:2011}, \tpj{} is a sufficient
+test but cannot be necessary.
+
+Algorithm~\ref{alg:tpj} (\tpj{}) modifies \bng{}, the modifications
+are limited to
+Lines~\ref{line:bnc-mod-start}-\ref{line:bnc-mod-end}. An additional
+benefit of \bng{} removing the pessimism of each ${q_j}$, is
+that each ${q_j}$ can be calculated without consideration of the
+current task \task{j} and the demand at ${D_k}$. Chunk values depend
+on the demand of ${D_{k-1}}$ instead. This permits an
+efficient implementation of \tpj{} by moving the slack calculation of
+the current interval to the end of each iteration. Otherwise, if slack
+were calculated earlier in each iteration, the changes to demand
+resulting from Lines~\ref{line:bnc-mod-start}-\ref{line:bnc-mod-end}
+would force the demand and slack of ${D_k}$ to be recalculated.
+
+The first notable change to \bng{} is introduced on
+Line~\ref{line:minq-start}, comparing the available slack to the WCET
+of a single thread of \ant{j}. If there is insufficient slack to
+execute just one thread of \ant{j} to completion, the task cannot be
+executed non-preemptively for any number of threads and the task set
+is infeasible non-preemptively.
+
+Lines~\ref{line:rem-p1}-\ref{line:rem-p2} introduce several
+subtle changes. For clarity, it is simpler to discuss
+the negative case (${\slack{\Deadline{k-1}} \ge \hat{c}_j(\hat{m}_j)}$)
+before the positive.
+When there is sufficient slack for ${\hat{m}_j}$ threads to execute
+without preemption, \ant{j} is given its full WCET
+(${\hat{c}_j(\hat{m}_j)}$) as its non-preemptive chunk. In other
+words, no division of \ant{j} is required and the posterior task set
+\tasks{} is unchanged (with respect to \ant{j}).
+Lines~\ref{line:rem-p1}-\ref{line:rem-p2} are avoided, the
+algorithm progresses to the next task such that ${d_i = D_k}$.
+
+However, in the positive case on Line~\ref{line:rem-p1} (when
+${\slack{\Deadline{k-1}} < \hat{c}_j(\hat{m}_j)}$), ${\hat{m}_j}$
+threads of \ant{j} cannot feasibly execute without being
+preempted. Therefore, \ant{j} must be divided. The \texdivide{}
+procedure creates a partial task \Partial{j} set of \ant{j}, such that
+all tasks ${\task{p} \in \Partial{j}}$ will complete within the
+available slack ${c_p(m_p) \le D_{k-1}}$. The posterior task set \tasks{}
+has \ant{j} removed, and is replaced by the partial set \Partial{j}
+maintaining the specified number of threads for \ant{j}.
+
+For any task \ant{j}, the task is transformed into a partial task set
+\Partial{j} and assigned a non-preemptive chunk only
+once in the iteration where the absolute deadline \Deadline{k} is
+equal to the relative deadline of the task:
+${\Deadline{k} = \hat{\deadline{j}}}$. Since tasks of \tasks{} are
+evaluated in strictly increasing absolute deadline order, the impact
+on demand and non-preemptive chunk sizes of processing \ant{j}
+exclusively impacts demand for larger intervals ${D_\ell > D_k}$ and
+non-preemptive chunk sizes for tasks ${\task{\ell} \in \tasks{}}$ with
+greater relative deadlines ${\deadline{\ell} > \hat{\deadline{}}_k}$.
+
+\begin{prop}[Divisions of \ant{j} Exclusively Impacts Interval of
+    Length ${t \ge \hat{\deadline{}}_j}$]
+\label{prop:divisions}
+Division of \ant{j} into the partial set \Partial{j}, and replacing
+\ant{j} in \tasks{} with \Partial{j} will impact demand exclusively
+for intervals of length ${\Deadline{k} \ge \hat{d}_j}$, 
+slack of absolute deadlines ${\Deadline{k} > \hat{d}_j}$ and therefore
+non-preemptive chunk values ${q_\ell}$ for tasks ${\task{\ell} \in
+  \tasks{}}$ with relative deadlines ${\deadline{\ell} \ge \Deadline{k}}$
+
+By definition of \dbf{\ant{j}}{$t$}, no task of \Partial{j} or \ant{j}
+can impact the task set \tasks{} demand \dbf{\tasks{}}{$t$} when
+${t < d_j}$. Thus replacing \ant{j} in \tasks{}, only affects the
+demand of intervals with length ${\hat{d}_j}$ or greater. Slack
+over the interval ${D_k}$ is calculated from exclusively shorter
+intervals. Since the demand of the current interval ${D_k}$ does not
+influence the slack at ${D_k}$, replacing \ant{j} in \tasks{} only
+affects the slack of intervals with length greater than
+${D_k}$. Non-preemptive chunk sizes are assigned based on the
+available slack, and only those assigned for an interval of length
+greater than ${D_k}$ can be affected by replacing \ant{j} in \tasks{}. 
+\end{prop}
+
+\begin{algorithm}[ht]
+  \caption{\text{\sc{divide}}}
+  \label{alg:divide}
+  \begin{algorithmic}[1]
+    \Procedure{divide}{\ant{j}, ${q}$}
+        \State ${\Partial{j} \gets \{\}}$
+        \State ${m \gets \underset{m \in \mathbb{Z}^+}\argmax
+          \left(\hat{c}_i(m) \le q \right)}$
+        \label{line:m-max}
+        \State ${r \gets \hat{m}_j}$
+        \While {${r > 0}$}
+            \State ${m_p \gets \min(r, m)}$
+            \State ${\task{p} \gets (\hat{p}_j, \hat{d}_j, m_p,
+              \hat{c}_j)}$
+            \Comment Posterior task, same period, deadline, WCET function.
+            \State ${\Partial{j} \gets \Partial{j} \cup \task{p}}$
+            \State ${r \gets r - m_p}$
+        \EndWhile
+      \State return \Partial{j}
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+
+On Line~\ref{line:divide} of the \tpj{} Algorithm~\ref{alg:tpj}, the task
+\ant{j} is divided into \Partial{j} by the \text{\sc{divide}}
+procedure. Pseudocode of \text{\sc{divide}} is given by
+Algorithm~\ref{alg:divide}. The number of tasks in \Partial{j} are
+determined by the maximum number of threads ${m}$ of \ant{j} that can
+execute non-preemptively within ${q}$ time units. Each task ${\task{k}
+  \in \Partial{j}}$ is assigned ${m}$ threads of \ant{j} or however
+many remain, whichever is less. The result is that each task set
+has the following properties. 
+
+\begin{prop}[Partial Task Sets Returned from \texdivide{}]
+  \label{prop:partial-task-set-size} The partial task set \Partial{j}
+  of an anterior task \ants{} for a specific ${q}$ value (and related
+  maximum threads assigned per job ${m}$ such that ${c_j(m) \le
+    q}$) contains posterior tasks where:
+  \begin{enumerate}
+    \item The exact number of posterior tasks is ${|\Partial{j}| = \lceil
+      \frac{\hat{m}_j}{m} \rceil}$ 
+    \item Exactly ${\lfloor \frac{\hat{m}_j}{m} \rfloor}$ tasks of
+      \Partial{j} are assigned ${m}$ threads per job.
+    \item There is at most one task ${\task{g} \in \Partial{j}}$ with
+      exactly ${m_g = \hat{m}_j \mod m}$ threads.
+  \end{enumerate}
+  
+\end{prop}
+
+\subsection{Non-Preemptive Feasibility of \tpj{} and \texdivide{}}
+\label{sec:feasibility}
+
+The \texdivide{} Algorithm~\ref{alg:divide} creates a partial task set
+\Partial{j} for an anterior task \ant{j}, assigning as many threads to
+each task in \Partial{j} as possible. Upon returning \Partial{j} to
+\tpj{}, \ant{j} is replaced in the task set \tasks{}.
+Algorithm~\ref{alg:divide} is one method of dividing of \ant{j} which
+\tpj{} could employ when creating the posterior task set
+\tasks{}. This section justifies \texdivide{}'s method
+by demonstrating the effect on schedulability and optimality of
+\tpj{}.
+
+This section's ultimate objective is to clearly convey
+Theorem~\ref{thm:tpj-optimal}; concluding that \tpj{} is optimal with
+respect to task-level non-preemptive multi-threaded feasibility. The
+theorems that precede Theorem~\ref{thm:tpj-optimal} establish minimal
+demand and WCET sums for partial sets created by \texdivide{}
+necessary to illustrate \tpj{}'s optimality.
+
+Non-preemptive EDF scheduling of jobs of multiple threads ordered by a
+thread-level scheduler (such as \bundle{} or \bundlep{}) allows
+preemptions between threads of the same job but precludes preemptions
+between jobs. Each task benefits from the advantages of thread-level
+scheduling by the exclusive use of the processor and shared
+resources. Since task set specifications may be divided, a
+specification is feasible when threads of the specification \ants{}
+may be assigned to tasks such that the posterior task set \tasks{} is
+feasible by EDF-NP. 
+
+\begin{definition}[npm-feasible]
+  A task set specification \ants{} is task-level non-preemptive
+  multi-threaded feasible (\emph{npm-feasible}) if there exists a
+  posterior task set \tasks{} of \ants{} such that all multi-threaded
+  jobs scheduled by EDF-NP will always meet their deadlines. 
+\end{definition}
+
+For the theorems that follow, unless necessary to discriminate between
+anterior and posterior tasks, the anterior task \ant{i} will be
+written \task{i}. The sum of the demand of the partial tasks of
+\task{i} for an interval of length ${t}$ is ${\sum_{\task{k} \in
+    \Phi_i} \dbf{\task{k}}{$t$}}$.  
+
+\newcounter{__lastdef} % Definition Counter
+\setcounter{__lastdef}{\value{theorem}}
+\setcounter{theorem}{0} % corollary is on the theorem counter :-(
+
+\begin{theorem}[Minimal Demand of Partial Task Sets Over All Intervals]
+  \label{thm:all-demand}
+  For a partial task set \Partial{i} of an anterior task \task{i} with
+  ${m_i}$ threads, minimizing ${\sum_{\task{k} \in \Phi_i}
+    \dbf{\task{k}}{\deadline{i}}}$ minimizes ${\sum_{\task{k} \in
+      \Phi_i} \dbf{\task{k}}{${t}$}}$ for all ${t \ge 0}$.
+\begin{proof}
+  Provided into two parts, when ${t < \deadline{i}}$ and
+  ${t \ge \deadline{i}}$. The first portion is a simple direct
+  argument. The second portion is by contradiction.
+
+  \emph{Part 1}: When ${t < \deadline{i}}$,
+  ${0 = \sum_{\task{k} \in \Phi_i}\dbf{\task{k}}{$t$}}$. By definition
+  of the demand bound function (Equation~\ref{eq:dbf}) the execution
+  requirement of a task is zero before the first possible
+  deadline. All tasks ${\task{k} \in \Partial{i}}$ share the same
+  relative deadlines ${d_k = d_i}$ and absolute deadlines because
+  ${p_k = p_i}$. These follow from the definition of
+  division (Definition~\ref{def:restrict-division}) and partial tasks
+  (Definition~\ref{def:partial-tasks}). Since ${t < \deadline{i}}$, ${\dbf{\task{k}}{$t$} = 0}$ for all ${\task{k} \in
+    \Partial{i}}$. Therefore, ${\sum_{\task{k} \in \Phi_i}
+    \dbf{\task{k}}{${t}$}}$ will be minimal (exactly zero) when ${t <
+    d_i}$, regardless of ${\sum_{\task{k} \in \Phi_i}
+    \dbf{\task{k}}{\deadline{i}}}$.
+
+  \emph{Part 2}: When ${t \ge \deadline{i}}$, assume
+  ${\sum_{\task{k} \in \Partial{i}} \dbf{\task{k}}{\deadline{i}}}$ is 
+  minimal and ${\sum_{\task{k} \in \Partial{i}} \dbf{\task{k}}{${t}$}}$ is
+  not minimal. Since all partial tasks ${\task{k} \in \Partial{i}}$ share
+  absolute deadlines (as described in Part 1), demand for each task
+  \dbf{\task{k}}{$t$} increases only for values of ${t}$ that equal
+  absolute deadlines. Furthermore, the execution requirement of
+  every \task{k} increases exactly by ${c_k(m_k)}$ for each absolute
+  deadline of ${\task{i} = \{ \Deadline{1}, \Deadline{2}, ... \}}$: %
+  \begin{equation*}
+    \indent
+    \begin{split}
+      \dbf{\task{k}}{\Deadline{1}} &= 1 \cdot c_k(m_k) \\
+      \dbf{\task{k}}{\Deadline{2}} &= 2 \cdot c_k(m_k) \\
+      ... \\
+      \dbf{\task{k}}{\Deadline{z}} &= z \cdot c_k(m_k)
+    \end{split}
+  \end{equation*}
+
+  Utilizing Property~\ref{prop:dmnd}, for ${t \ge d_i}$ and
+  \Deadline{z}, where \Deadline{z} is the greatest absolute deadline
+  of \task{i} less than or equal to ${t}$ (${\Deadline{z} \le t}$): %
+  \begin{equation*}
+    \indent
+    \begin{split}
+    \sum_{\task{k} \in \Partial{i}} \dbf{\task{k}}{${t}$} &=
+      \sum_{\task{k} \in \Partial{i}} z \cdot
+      \dbf{\task{k}}{\deadline{i}} 
+      & = z \cdot \sum_{\task{k} \in \Partial{i}} \dbf{\task{k}}{\deadline{i}}
+    \end{split}
+  \end{equation*}
+
+  Because ${z}$ depends on ${t}$ (and is completely independent of the
+  division of the partial task set), if ${\sum_{\task{k} \in \Partial{i}}
+    \dbf{\task{k}}{$t$}}$ were not minimal then
+  ${\sum_{\task{k} \in \Partial{i}} \dbf{\task{k}}{\deadline{i}}}$ could not
+  be minimal, contradicting the assumption.
+
+  Combining Parts 1 and 2, when the demand for the partial tasks of
+  \task{i} is minimized for the interval ${d_i}$, the demand of
+  partial tasks of \task{i} is minimized for all intervals of length 
+  ${t \ge 0}$.    
+\end{proof}
+\end{theorem}
+
+\begin{corollary}[Minimal WCET Sum of \Partial{i} Minimizes Demand
+    Over the Interval \deadline{i}]
+  \label{corollary:min-demand-di}
+  The demand of \Partial{i} over the interval \deadline{i} is
+  minimized when the sum of WCET of \Partial{i} is minimized.
+\begin{proof} Following directly from
+  Theorem~\ref{thm:all-demand}, where the demand over the interval
+  \deadline{i} of each task ${\task{k} \in \Partial{i}}$ is given by
+  ${\dbf{\task{k}}{\deadline{i}} = 1 \cdot c_k(m_k) =
+    c_k(m_k)}$. Then,
+
+  \begin{equation*}
+    \indent
+    \begin{split}
+      \sum_{\task{k} \in \Partial{i}} \dbf{\task{k}}{\deadline{i}} &=
+        \sum_{\task{k} \in \Partial{i}} c_k(m_k)
+    \end{split}
+  \end{equation*}
+
+  Thus, minimizing ${\sum_{\task{k} \in \Partial{i}} c_k(m_k)}$
+  minimizes ${\sum_{\task{k} \in \Partial{i}}
+  \dbf{\task{k}}{\deadline{i}}}$
+\end{proof}
+
+\end{corollary}
+
+\begin{corollary}[Minimal WCET Sum of \Partial{i} Minimizes Demand
+    Over all Intervals ${t \ge 0}$]
+  \label{corollary:min-wcet-di}
+  The demand of \Partial{i} over alls interval ${t \ge 0}$ is
+  minimized when the sum of WCET of \Partial{i} is minimized.
+\begin{proof} Following directly from
+  Theorem~\ref{thm:all-demand} and Corollary~\ref{corollary:min-demand-di}.
+\end{proof}
+
+\end{corollary}
+
+\newcounter{__lasttheorem} % Theorem Counter
+\setcounter{__lasttheorem}{\value{theorem}}
+\setcounter{theorem}{\value{__lastdef}}
+\begin{definition}[Assumptions of Theorem~\ref{thm:tpj-wcet-sum}]
+  \label{def:assumptions}
+  For the following theorem, there are several assumptions that
+  must be upheld for the result to be valid. These assumptions are
+  consequences of the non-preemptive setting and requirements of the
+  task set specification. 
+  
+  \begin{enumerate}
+  \item All tasks \task{i} must be characterized by strictly increasing
+    discrete concave WCET function ${c_i(m_i)}$.
+  \item Any task ${\task{i} \in \tasks{}}$ where ${c_i(m_i) > q_i}$ is
+    not schedulable non-preemptively. Consequently, no assignment of
+    ${m_i}$ may cause ${c_i(m_i) > q_i}$ or the task set is infeasible.
+  \item The greatest number of threads assigned to a task \task{i}
+    such that ${c_i(m_i) \le q_i}$ is named
+    ${m = \underset{m \in \mathbb{Z}^+}\argmax \left(c_i(m) \le q_i
+      \right)}$.
+  \end{enumerate}
+\end{definition}
+
+\setcounter{__lastdef}{\value{theorem}}
+\setcounter{theorem}{\value{__lasttheorem}}
+
+\begin{theorem}[Minimal Sum of WCET of \Partial{i} for any ${q}$ by
+    \texdivide{}]
+  \label{thm:tpj-wcet-sum}
+  For an anterior task \ant{i} and non-preemptive chunk size ${q}$,
+  \texdivide{} will produce a partial task set \Partial{i} with
+  minimum WCET sum among all possible partial task sets of \ant{i}.
+
+  \begin{proof} To illustrate a contradiction, assume \Partial{i}
+    returned from \texdivide{} does not have the minimal WCET sum
+    for a specific ${q}$ and task \ant{i}. There must exist  a partial
+    task set \Partial{k} of \ant{i} that differs, ie. ${\Partial{i}
+      \not = \Partial{k}}$ and 
+    \begin{equation*}
+      \indent
+      \sum_{\task{k} \in \Partial{k}} c_k(m_k) <
+      \sum_{\task{j} \in \Partial{i}} c_j(m_j)
+    \end{equation*}
+
+    By Property~\ref{prop:partial-task-set-size} of partial tasks
+    created by \texdivide{}, \Partial{i} will have at most one task
+    with less than ${m}$ threads assigned to it. For \Partial{k} to
+    differ, it must have at least two tasks with less than ${m}$
+    threads assigned to them. Call these two tasks with less than
+    ${m}$ threads ${\task{x}, \task{y} \in \Partial{k}}$. Select
+    \task{x} as the task with the greater number of threads
+    ${m_x \ge m_y}$.
+
+    Consider the impact on ${\sum_{\task{k} \in \Partial{k}}
+      c_k(m_k)}$ of moving one thread of \task{y} to \task{x}, as the
+    operation of adding the difference of WCET values for
+    ${c_x(m_x + 1)}$ and ${c_y(m_y - 1)}$ to the sum. 
+    \begin{eqnarray*}
+      \lefteqn{
+      \left(\sum_{\task{k} \in \Partial{k}} c_k(m_k) \right)
+      - c_x(m_x) + c_x(m_x + 1)
+      - c_y(m_y) + c_y(m_y - 1)} \\
+      & = & \left(\sum_{\task{k} \in \Partial{k}} c_k(m_k) \right)
+      + (c_x(m_x + 1) - c_x(m_x)) - (c_y(m_y) - c_y(m_y - 1))
+    \end{eqnarray*}
+    
+    By the concave growth Property~\ref{prop:ni-growth} and virtue of
+    ${m_y \le m_x}$, the quantity ${(c_x(m_x + 1) - c_x(m_x))}$ is
+    less than or equal to ${(c_y(m_y) - c_y(m_y - 1))}$ so the
+    difference must be less than or equal to zero. Therefore:
+    \begin{equation*}
+      \left(\sum_{\task{k} \in \Partial{k}} c_k(m_k) \right)
+      + (c_x(m_x + 1) - c_x(m_x)) - (c_y(m_y) - c_y(m_y - 1)) \le 
+      \sum_{\task{k} \in \Partial{k}} c_k(m_k)
+    \end{equation*}
+
+    The WCET sum of \Partial{k} can be reduced by moving one thread of
+    \task{y} to \task{x}. When ${m_x = m}$ no more threads may be
+    assigned to \task{x} or the system will be infeasible by
+    Definition~\ref{def:assumptions}. While there are two (or more)
+    tasks of ${\task{x}, \task{y} \in \Partial{k}}$ with fewer than
+    ${m}$ threads assigned, moving one thread from \task{y} to
+    \task{x} will reduce the WCET sum. By repeatedly moving tasks to
+    reduce the WCET sum, \Partial{k} will satisfy all aspects of
+    Property~\ref{prop:partial-task-set-size} of partial task sets
+    created by \texdivide{}, ie. ${\Partial{i} = \Partial{k}}$ after
+    all moves have been completed. This contradicts the assumption
+    that ${\Partial{i} \not = \Partial{k}}$ and the relationship of
+    their WCET sums, therefor \Partial{i} is minimal.
+  \end{proof}
+\end{theorem}
+
+\setcounter{__lasttheorem}{\value{theorem}}
+
+\setcounter{theorem}{\value{__lastdef}}
+\setcounter{theorem}{\value{__lasttheorem}}
+\begin{theorem}[\tpj{} is Optimal with Respect to npm-feasibility]
+  \label{thm:tpj-optimal}
+  For a task set specification \ants{}, \tpj{} returns feasible if and
+  only if there exists an npm-feasible posterior task set \tasks{} of
+  \ants{}.
+
+  \begin{proof}
+    \emph{Forward Direction} (\tpj{} returns feasible for \ants{}
+    ${\implies \exists}$ a posterior task set ${\tasks{}~|~\tasks{}}$
+    is npm-feasible): The \tpj{} algorithm returned a 
+    posterior task set \tasks{} where the infeasibility condition
+    (Equation~\ref{eq:baruah-07}) is never satisfied across intervals
+    of length ${0 \le t \le T^*(\tasks{})}$ and every job of
+    ${\task{i} \in \tasks{}}$ executes non-preemptively for ${c_i(m_i)
+      \le q_i}$ time units. Therefore, \tasks{} is npm-feasible. 
+
+    \emph{Reverse Direction} (${\exists}$ a posterior task set
+    ${\tasks{}~|~\tasks{}}$ is npm-feasible ${\implies}$ \tpj{}
+    returns feasible for \ants{}): For the purpose of demonstrating a
+    contradiction, assume \tpj{} returns infeasible for an
+    npm-feasible task set \ants{}. Name the absolute deadline which
+    \tpj{} returned infeasibility for ${D_x}$ from the set
+    ordered deadlines ${\{D_1, D_2, ... \}}$ and the task which
+    generated ${D_x}$, \ant{x}. Name the set of tasks with relative
+    deadlines smaller than ${\hat{d}_x}$, ${\bar{\tasks{}}}$. 
+
+    For any task ${\task{k} \in \bar{\tasks{}}}$ and partial task set
+    ${\Partial{k}}$ of ${\task{k}}$ included in the posterior set
+    \tasks{}, the number of tasks and threads assigned to each
+    \Partial{k} cannot be affected by \ant{x} due to
+    ${\hat{d}_x > d_k}$ and Property~\ref{prop:divisions}. The
+    combined set of posterior tasks of ${\bar{\tasks{}}}$ in \tasks{}
+    is denoted
+    ${\dot{\tasks} = \cup_{\task{k} \in \bar{\tasks{}}} \Partial{k}}$.
+    
+    There are two cases where \tpj{} will return infeasible for
+    \ants{}, on Line~\ref{line:no-slack-infease} and
+    Line~\ref{line:more-demand}. Both illustrate a contradiction with 
+    the respect to demand.
+
+    \emph{Line~\ref{line:no-slack-infease}}: If \tpj{} returns
+    infeasible for \ants{} on Line~\ref{line:no-slack-infease} there is
+    insufficient slack ${q_x}$ to execute any one-thread job of
+    \ant{x} non-preemptively. Since slack is inversely related to
+    demand, the demand of ${\dot{\tasks{}}}$ is too great to allow any
+    thread of \task{x} as part of a feasible task set.
+
+    \emph{Line~\ref{line:more-demand}}: If \tpj{} returns infeasible
+    for \ants{} on Line~\ref{line:more-demand}, there is insufficient
+    supply for \Partial{x} (the set of partial tasks of \ant{x}). By
+    Corollary~\ref{corollary:min-demand-di} and
+    Theorem~\ref{thm:tpj-wcet-sum} the demand of \Partial{x} is
+    minimal over all intervals for the available slack ${q_x}$. Due to
+    Property~\ref{prop:divisions} only tasks with shorter relative
+    deadlines i.e. ${\dot{\tasks{}}}$, can impact the demand of
+    \Partial{x} by affecting ${q_x}$. In this case, the demand of
+    ${\dot{\tasks{}}}$ is too great for the demand of \Partial{x} to
+    be included as part of a feasible task set.
+
+    By assumption \ants{} is npm-feasible, the infeasibility
+    conditions on Lines~\ref{line:no-slack-infease}
+    and~\ref{line:more-demand} of \tpj{} indicate the demand of 
+    ${\dot{\tasks{}}}$ is too great. However, \tpj{} adds each
+    partial set \Partial{k} to ${\dot{\tasks{}}}$ in increasing
+    deadline order. By Property~\ref{prop:divisions}, every 
+    \Partial{k} added to ${\dot{\tasks{}}}$ exclusively impacts the
+    demand of larger deadlines. Every \Partial{k} increases the demand of
+    ${\dot{\tasks{}}}$ minimally starting with ${D_1}$, maximizing the
+    slack available for partial task sets with greater deadlines; thus
+    the demand of ${\dot{\tasks{}}}$ is minimal and cannot be
+    reduced. For \ants{} to be npm-feasible, there must be another
+    partial task set that reduces ${\dot{\tasks{}}}$'s demand,
+    which is a direct contradiction. Therefore, \tpj{} must return
+    feasible.
+  \end{proof}
+\end{theorem}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Evaluation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Evaluation}\label{sec:eval}
+
+Evaluation~\cite{NPM-Artifact:2019} of \tpj{} and the non-preemptive
+multi-threaded task model presented in this work focuses on the
+schedulability ratio of synthetic task sets and a case study based
+upon the evaluation of \bundlep{}~\cite{Tessler:2018b}. The ratio of
+task set specifications deemed schedulable by \tpj{} for EDF-NP will
+be compared to \npchunks{} in both limited and fully preemptive
+settings for EDF. What follows is a description of the parameters to
+task set specification generation, the prescribed evaluation metrics,
+and analysis of the results. 
+
+\subsection{Generating Task Sets}
+
+A specified task set \tasks{} is generated with four parameters,
+${M}$ the total number of threads of execution, ${U}$ the target
+utilization, a maximum growth factor \GFactor{}, and ${m}$ the maximum
+number of threads per task. The number of threads ${M}$ may be one of
+${\{3, 5, 7, 10, 25, 50, 100\}}$ with dependent ${m}$ values of
+${\{2, 2, 3, 4, 8, 16, 32\}}$. Utilization varies from [0.1, 0.9]
+and the growth factor varies from [0.1, 0.9] independently by
+increments of 0.1. 
+
+Each task ${\task{i} \in \tasks{}}$ is assigned ${m_i}$ threads from
+a random uniform integer distribution over ${[1, m]}$, such that the
+sum of all threads is equal to ${M = \sum_{\task{i} \in \tasks{}}
+  m_i}$. A task's period \period{i} is from a uniform integer
+distribution over [10, 1000]. Utilization ${u_i}$ of each task
+\task{i} is calculated using the ${\text{UUniFast}(n,
+  U)}$~\cite{Bini:2004} algorithm, where ${n = |\tasks{}|}$.
+
+A task's WCET is assigned for ${m_i}$ threads,
+${c_i(m_i) = \lceil p_i \cdot U_i \rceil}$. Tasks
+are given a growth factor ${\GFactor{}_i}$ in a uniform real
+distribution over ${[0.1, \GFactor{}]}$.  The remaining ${m_i - 1}$
+WCET values are determined by substituting ${\GFactor{}_i}$ into
+Equation~\ref{eq:gfactor-eval}. The relative deadline of \task{i},
+\deadline{i} is taken from a uniform integer distribution over
+${[\max(c_i(m_i),p_i/2), 1000]}$.
+
+For each combination of ${(M, m, U, \GFactor{})}$, 1000 task sets
+specifications are generated. Figure~\ref{fig:gen-params} summarizes
+the parameters of task set generation. The smaller values of ${M}$ are taken
+from~\cite{Bertogna:2010} and the dependent ${m}$ values were selected
+to avoid one task consuming more than half of the threads in the
+task set specification (where possible).
+
+\begin{figure}[h]
+  \centering
+  \tabcolsep=.11cm
+  \begin{tabular}{|r|l|}
+    \hline
+    ${U}$ & [0.1, 0.9] \\
+    \GFactor{} & [0.1, 0.9] \\
+    \hline
+  \end{tabular} 
+  \begin{tabular}{|r|lllllll|}
+    \hline
+    ${M}$ & \{3, & 5, & 7, & 10, & 25, & 50, & 100\} \\
+    ${m}$ & \{2, & 2, & 3, & 4, & 8, & 16, & 32\} \\
+    \hline
+  \end{tabular}
+  \caption{Task Set Generation Parameters }
+  \label{fig:gen-params}
+\end{figure}
+
+\subsubsection{Applicability of Parameters}
+
+To avoid favoring \tpj{}, the task set generation parameters ${m}$ and
+\GFactor{} were carefully selected. For the threads per task ${m}$, a
+large ${m}$ favors \tpj{}. Therefore, no single task my be
+assigned more than half the total threads: ${m \le \lfloor \frac{M}{2}
+\rfloor}$ (except for ${M = 3}$). 
+
+The growth factor \GFactor{} is informed by previous results for
+\bundlep{}~\cite{Tessler:2018b}. In~\cite{Tessler:2018b},
+multi-threaded tasks are constructed from the M{\"a}lardalen WCET
+benchmarks~\cite{Gustafsson:2010}. Task analysis
+in~\cite{Tessler:2018b} yields growth factors below 0.1 for several
+benchmarks. A lower bound (0.1) on \GFactor{} greater than observed
+values is pessimistic, resulting in less favorable results for \tpj{}.
+
+\subsection{Case Study}
+
+\bundlep{}'s evaluation covers 18 benchmarks for distinct architecture
+configurations. An architecture configuration includes the block
+reload time (BRT), cycles per instruction (CPI), and number of cache
+lines. One of the least favorable in terms of the analytical
+benefit of \bundlep{} is a BRT of 100, CPI of one, and 32 cache
+lines. From this configuration, the WCET values and growth factors
+were extracted, growth factors ranging in the range
+${[0.08,3.02]}$.\footnote{Due to length restrictions the full listing
+  of WECT and growth factors are omitted.}
+
+From these results of \bundlep{} 1000 task sets with 18 tasks (one per
+benchmark) and a total 100 threads were generated per utilization
+target. The utilization target ranged from 0.1 to 1.0 increments of
+0.1. Threads were assigned to each task \task{i} from a distribution
+over ${m_i \in [2,8]}$. Each tasks utilization, period, and deadline,
+${c_i(m_i)}$ were assigned using the same method as synthetic tasks.
+The WCET values for fewer threads ${1 \le k < m_i}$, were scaled such
+that the value of ${c_i(k) / c_i(m_i)}$ remained constant after the
+${c_i(m_i) = \lceil p_i \cdot U_i \rceil}$ assignment.
+
+
+\subsection{Evaluation Metrics}
+
+\tpj{} is compared with the \npchunks{} schedulability test in
+non-preemptive (EDF-NP) and preemptive (EDF-P) settings. The focus of
+the evaluation is on the non-preemptive setting. The preemptive
+setting serves as a comparison to alternative scheduling strategies
+and the theoretical best case. For EDF-P, preemptions incur
+\textbf{no} penalty, CRPD or otherwise. In this highly advantageous
+setting for EDF-P, \tpj{} can still produce feasible non-preemptive task
+sets \npchunks{} deems infeasible in a preemptive setting!
+
+To compare schedulability tests, each task set specification \ants{}
+is provided to \tpj{} without modification under EDF-NP
+scheduling. \tpj{} will transform the task set producing a
+posterior task set \tasks{} if a feasible one exists. A task set
+specification \ants{} cannot be provided directly to \npchunks{},
+since \npchunks{} has no concept of threads per job. 
+
+To be suitable for analysis by \npchunks{}, a task set specification
+\ants{} is transformed into two posterior task sets. The first task
+set, ${\tasks{}^1}$ represents single-threaded tasks by including all
+threads of \ants{} as individual tasks. The second task set,
+${\tasks{}^m}$ represents the tasks of \ants{} as indivisible,
+executing all specified threads without preemption per job. Each task
+in ${\tasks{}^m}$ benefits from the  thread-level scheduler but does
+not expose the threaded nature of the task to the scheduling
+algorithm. This is achieved by modifying an anterior task \ant{j} with
+${\hat{m}_j > 1}$ and ${\hat{c}_j(\hat{m}_j)}$ to a posterior task
+\task{j} with ${m_j = 1}$ and ${c_j(1) = \hat{c}_j(\hat{m}_j)}$. 
+
+\begin{figure}[ht]
+  \centering
+  \begin{tabular}{|c|c|l|l|}
+    \hline
+    \textbf{Test} & \textbf{Task Set} & \textbf{EDF-NP} & \textbf{EDF-P} \\
+    \hline
+    \hline
+    \tpj{} & \ants{} & EDF-TPJ & - \\
+    \hline
+    \multirow{2}{*}{\npchunks{}}
+    & ${\tasks{}^1}$ & EDF-NP:1 & EDF-P:1 \\
+    & ${\tasks{}^m}$ & EDF-NP:M & EDF-P:M \\
+    \hline
+  \end{tabular}
+  \caption{Schedulability Test Combinations}
+  \label{table:combinations}
+\end{figure}
+
+The \npchunks{} schedulability test will produce results for
+${\tasks{}^1}$ and ${\tasks{}^m}$ in both preemptive and
+non-preemptive settings. For non-preemptive schedulability analysis,
+each task ${\task{i} \in \tasks{}^1}$ or ${\tasks{}^m}$ must have a
+non-preemptive chunk size ${q_i \ge c_i(m_i)}$. When evaluating
+preemptive EDF schedulability for ${\tasks{}^1}$ and ${\tasks{}^m}$,
+the results are labeled EDF-P:1 and EDF-P:M respectively. When
+evaluating non-preemptive EDF schedulability, the results are labeled
+EDF-NP:1 and EDF-NP:M. Schedulability results for \tpj{} under EDF-NP
+scheduling are labeled EDF-TPJ. Table~\ref{table:combinations} gives a
+synopsis of the schedulability tests. Schedulability ratios for each
+of the combinations are calculated for every ${(M, m, U, \GFactor{})}$ 
+configuration.
+
+
+It must be noted that EDF-P:M is an unrealistic schedulability
+test. It serves only as a theoretical limit to the benefits of concave
+growth. Concave growth is a result of scheduling threads of the same
+job without preemption by another job with a \texttt{BUNDLE}-based
+thread-level scheduler.  However, current \texttt{BUNDLE}
+implementations require that an executing task cannot be
+preempted by a different task.  Such a preemption would destroy the
+cache benefits and analysis of \texttt{BUNDLE} scheduling. Analysis of
+EDF-P:M assumes preemptions between jobs are allowed and
+have zero cost. It is included as a reference for \tpj{}'s
+performance, as a ceiling for what is theoretically possible given
+ideal (but likely impossible) conditions.
+
+As a consequence of transforming multi-threaded task set
+specifications \ants{} to single-threaded task sets ${\tasks{}^1}$,
+some single threaded task sets may not be feasible. One reason for a
+task set ${\tasks{}^1}$ to become infeasible is the 
+utilization exceeding one, while ${\tasks{}^m}$ and \ants{} have
+utilization less than one. In this setting, EDF-TPJ
+is capable of scheduling task sets that preemptive EDF cannot.
+
+For a task set specification configuration ${(M, m, U, \GFactor{})}$,
+call ${S}$ the set of all task set specifications \ants{} generated
+for the configuration. Call ${s}$ the set of ${\tasks{}^1}$ task sets
+transformed from ${\ants{} \in S}$ such that ${\tasks{}^1}$ has
+utilization greater than one. The set \stpj{} is the subset of ${s}$ deemed feasible
+by the \tpj{} schedulability test. That is, \stpj{} is the set of all
+tasks \tpj{} could schedule, yet EDF-P:1 could not (even) when CRPD
+values are zero.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Results
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Results}
+\newcommand{\cwidth}{.48\linewidth}
+% Total number of task sets
+\renewcommand{\totalTaskSets}{567000}
+% Total number of task sets when \tau^1 utilization > 1
+\renewcommand{\totalOverOne}{183661}
+% Total number of OverOne task sets TPJ could schedule
+\renewcommand{\totalOOTPJ}{57428}
+% OverOne Ratio
+\renewcommand{\ratioOverOne}{0.3239}
+% TPJ ratio
+\renewcommand{\ratioOOTPJ}{0.3127}
+
+\begin{figure}[h]
+  \centering
+  \begin{subfigure}{\cwidth}
+    \includegraphics[width=\linewidth]{plot/cs-ratio/cs-ratio}
+    \caption{\texttt{BUNDLEP} Case Study}
+    \label{fig:cs-ratio}
+  \end{subfigure}%
+  \begin{subfigure}{\cwidth}
+    \includegraphics[width=\linewidth]{plot/avg-alg-sched/avg-ratio-TPJ-i}
+    \caption{EDF-TPJ Summary}
+    \label{fig:avg-ratio-TPJ-i}
+  \end{subfigure}
+  \caption{Case Study and EDF-TPJ Summary Results}
+\end{figure}
+
+Schedulability ratios from the \bundlep{} case study are given in
+Figure~\ref{fig:cs-ratio}. For the target architecture and 18 benchmarks, EDF-TPJ consistently outperforms the other non-preemptive
+algorithms. For preemptive EDF-P:1 (with zero cost preemptions), EDF-TPJ
+has higher schedulability ratios for the majority of target
+utilization values. EDF-TPJ's comparative performance increases
+with the target utilization. This case study demonstrates the benefit
+of \tpj{} to non-preemptive and (potentially) preemptive approaches.
+ 
+Figures~\ref{fig:avg-ratio-TPJ-i}, \ref{fig:avg-ratio-NP-1}, and \ref{fig:avg-ratio-NP-m}, summarize the results for the synthetic
+task sets varied by the utilization and growth factor. Within
+each graph, the schedulability ratios provided by EDF-P:1 and EDF-P:M serve as
+references. The difference between EDF-P:1 and the subject of the
+graph illustrate the benefit of preemptive scheduling. Inclusion of
+EDF-PM highlights the theoretical limit of concave growth to
+schedulability.
+
+\begin{figure}[hb]
+  \centering
+  \begin{subfigure}{\cwidth}
+    \includegraphics[width=\linewidth]{plot/avg-alg-sched/avg-ratio-NP-1}
+    \caption{EDF-NP:1 Summary}
+    \label{fig:avg-ratio-NP-1}
+  \end{subfigure}%
+  \begin{subfigure}{\cwidth}
+    \includegraphics[width=\linewidth]{plot/avg-alg-sched/avg-ratio-NP-m}
+    \caption{EDF-NP:M Summary}
+  \label{fig:avg-ratio-NP-m}
+  \end{subfigure}
+  \caption{EDF-NP:1 and EDF-NP:M Summary}
+\end{figure}
+
+Including EDF-P:1 and EDF-P:M in each of the summary
+graphs eases the comparison between EDF-NP:1, EDF-NP:M, and
+EDF-TPJ. Comparing EDF-NP:1 (\ref{fig:avg-ratio-NP-1}) to EDF-NP:M
+(\ref{fig:avg-ratio-NP-m}), illustrates the benefits of the model and
+scheduling mechanism. EDF-NP:M has a consistently higher
+schedulability ratio for all utilizations and growth factors. EDF-TPJ
+(\ref{fig:avg-ratio-TPJ-i}) outperforms EDF-NP:M, with higher schedulability
+ratios for all utilizations and growth factors due to the ability to
+transform task sets. EDF-TPJ performs best among the non-preemptive
+tests across all configurations. Additionally, EDF-TPJ is able to
+schedule task sets deemed infeasible for EDF-P:1.
+
+Table~\ref{table:by-m} summarizes the infeasible utilization
+findings for the synthetic tasks. For moderate and larger values of
+${M (\ge 25)}$, the number of infeasible by utilization task sets
+dominate the specifications. For 25, 50, and 100 total threads, the
+infeasible by utilization comprise 44, 59, and 74 percent of the task
+sets respectively, with EDF-TPJ finding 25, 34, and 45 percent 
+feasible. This illustrates the large potential of the proposed model,
+in conjunction with concave growth WCET functions of
+thread-level schedulers (e.g. \bundle{} and \bundlep{}).
+
+\begin{figure}[ht]
+  \centering
+  \begin{tabular}{|r||c|c|c|c|c|c|c||l|}
+\hline
+${(M, m)}$ & ${(3, 2)}$ & ${(5, 2)}$ & ${(7, 3)}$ & ${(10, 4)}$ & ${(25, 8)}$ & ${(50, 16)}$ & ${(100, 32)}$ & Total \\
+${|S|}$ & 81000 & 81000 & 81000 & 81000 & 81000 & 81000 & 81000 & 567000 \\
+${|s|}$ & 3131 & 4973 & 11744 & 18689 & 36565 & 49147 & 59412 & 183661 \\
+${|\stpj{}|}$ & 465 & 291 & 1437 & 3065 & 9426 & 16912 & 25832 & 57428 \\
+\hline
+\end{tabular}
+\caption{${U > 1}$ Feasibility}
+\label{table:by-m}
+\end{figure}
+
+There are two noteworthy trends within the schedulability results.
+The simpler of the two is the relationship between utilization and
+schedulability ratio for a fixed growth
+factor. Figure~\ref{fig:M10F.5} illustrates the trend common among ${M
+  \le 10}$ total threads. The trend for preemptive and non-preemptive
+schedulability tests when utilization increases is for the
+schedulability ratio to decrease. However, EDF-TPJ always outperforms 
+the other non-preemptive tests. 
+
+The second trend is slightly more complex. Figure~\ref{fig:M10U.5} was
+selected for the smallest ${M}$ and ${U}$ values with visually
+distinct plots per schedulability test. The growth factor and the
+schedulability ratio are correlated. As the growth factor increases,
+so does the schedulability ratio. This is due to the utilization being
+held constant. When the growth factor is small, the WCET of the first
+thread of each task is larger. Larger WCET values are harder to
+schedule non-preemptively.  
+
+\begin{figure}[ht]
+  \centering
+  \begin{subfigure}{\cwidth}
+    \includegraphics[width=\linewidth]{plot/2D-UFS/2D-M010m04F0_5xS}%
+    \caption{${(M,m,U,\GFactor{}) = (10,4,*,0.5)}$}
+    \label{fig:M10F.5}
+  \end{subfigure}%
+  \begin{subfigure}{\cwidth}
+    \includegraphics[width=\linewidth]{plot/2D-UFS/2D-M007m03U0_5xS.pdf}%
+    \caption{${(M,m,U,\GFactor{}) = (7,3,0.5,*)}$}
+    \label{fig:M10U.5}
+  \end{subfigure}%
+  \caption{${M \le 10}$ Performance}%
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\cwidth]{plot/2D-UFS/2D-M025m08U0_7xS}\quad
+  \includegraphics[width=\cwidth]{plot/2D-UFS/2D-M025m08F0_9xS}%
+  \caption{${M > 10}$ EDF-TPJ Performance Above EDF-P:1}
+  \label{fig:m25-tpj}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\cwidth]{plot/2D-UFS/2D-M100m32F0_4xS}\quad
+  \includegraphics[width=\cwidth]{plot/2D-UFS/2D-M100m32U0_5xS}%
+  \caption{${M = 100}$ EDF-TPJ Performance}
+  \label{fig:m100-tpj}
+\end{figure}
+
+As ${M}$ increases beyond 10 total threads, the number of infeasible
+by utilization task sets ${s}$ grows. This contributes to the
+schedulability ratio of EDF-TPJ surpassing EDF-P:1 for
+threshold utilization and growth factor values. For ${M = 25}$, the
+threshold of utilization is between ${[0.6,0.7]}$ shown in
+Figure~\ref{fig:m25-tpj}.
+
+For ${M = 100}$ and ${\GFactor \le 0.4}$, EDF-TPJ outperforms
+EDF-P:1. Figure~\ref{fig:m100-tpj} highlights the advantage of
+EDF-TPJ compared to EDF-P:1 by virtue of concave growth. It also
+highlights the benefit of dividing tasks, as the performance of
+EDF-NP:M is always below EDF-TPJ.
+
+The comparative performance of EDF-TPJ is at its lowest
+for ${M < 10}$ threads and ${U > .4}$ utilization. In these ranges
+EDF-TPJ maintains the highest schedulability ratio among the
+non-preemptive methods, but the ratio is closer to EDF-NP:M or
+EDF-NP:1 than EDF-P:1. This suggests, the decrease in EDF-TPJ's
+performance is more likely due to the non-preemptive setting combined
+with larger WCET values for individual threads.
+
 \input{75-conclusion/00-conclusion.tex}
 
 \bibliography{main}
