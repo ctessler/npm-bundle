@@ -434,10 +434,290 @@ addresses inter-thread variability, with the execption of
 Calandrino's~\cite{Calandrino:2009} limited cache spread. However, the
 results of~\cite{Calandrino:2009} are strictly empirical.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Model
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Model}
+\label{sec:model}
+
+To permit non-preemptive jobs that utilize thread-level schedulers, a
+new model is proposed in this work. The set of ${n}$ multi-threaded
+tasks is given by ${\tasks}$ ${= \{\task{0}, \task{1}, ...,
+\task{n-1}\}}$. Each job of a task ${\task{i} = (\period{i},
+\deadline{i}, \taskthreads{i}, c_i:\mathbb{N} \mapsto
+\mathbb{R}^+)}$ has a minimum inter-arrival time of \period{i} and
+relative deadline \deadline{i}. For every job release of \task{i}, a
+positive integer \taskthreads{i} identical threads are released.  Each
+thread of \task{i} executes over the same object \object{i} on the
+shared processor. An object is a set of executable machine
+instructions, mapping to one set of in memory addresses, such that all
+threads execute the same instruction from the same address. All
+threads share the same deadline as their job. The worst-case execution
+time (WCET) of \task{i} is a function of the number of threads per
+job, \wcet{i}{\taskthreads{i}}.
+
+Scheduling and schedulability analysis proposed in this work relies upon
+a relationship between the number of threads scheduled per
+multi-threaded job and the WCET of the job executed
+non-preemptively. To clarify, the scheduling mechanism proposed in
+this work precludes preemptions between jobs of different tasks. For
+threads within a job of a task, a thread-level scheduler may execute
+threads preemptively. Figure~\ref{fig:preemptivity} illustrates the
+scheduling behavior.
+
+In Figure~\ref{fig:preemptivity}, at ${t = 1}$ a job of \task{2} is
+released. The job of \task{2} cannot be preempted by the job of \task{1} 
+released at ${t = 5}$. During the execution of \task{2}, the two
+threads (given distinct colors) may preempt one another according to
+the thread-level scheduler, at ${t = 8}$ for instance. Thread-level
+scheduling and preemption decisions are not prescribed by this
+work. The thread-level scheduling policies of \task{1} and \task{2}
+are independent of the non-preemptive task-level scheduling of
+non-preemptive EDF used in this work. 
+
+\begin{figure}[b]
+  \centering
+  \begin{subfigure}{.35\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{preemptivity}
+    \caption{Scheduling Behavior}
+    \label{fig:preemptivity}
+  \end{subfigure}
+  \begin{subfigure}{.58\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{process}  
+    \caption{Schedulability and Transformable Task Sets}
+    \label{fig:process}
+  \end{subfigure}
+  \caption{Scheduling and Schedulability of the Proposed Model}
+\end{figure}
+
+Thread-level scheduling algorithms must be characterized by a WCET
+function ${c_i(m_i)}$ for ${m_i}$ threads per job and ${c_i(m_i)}$ must be
+strictly increasing discrete and concave (detailed in
+Subsection~\ref{sec:discrete-growth}). Thread-level schedulers that
+produce concave ${c_i(m_i)}$ functions establish a relationship
+between the execution requirements of a task and the number of
+threads, where the requirement for one job of ${m_i}$ threads is less
+than ${m_i}$ jobs of one thread. For \texttt{BUNDLE}-based schedulers,
+concavity is the result of the inter-thread cache benefit, where
+${c_i(m) - c_i(m - 1) \ge c_i(m+1) - c_i(m)}$; it is this
+relationship the proposed scheduling behavior and analysis seek
+to exploit.
+
+Not all tasks and thread-level schedulers will produce concave WCET
+functions. For a task \task{i} with a convex WCET function (where
+there is no benefit in grouping threads together), the
+${m_i}$ threads of \task{i} may be replaced with ${m_i}$
+single-threaded tasks. These single-threaded have vacuously concave
+WCET functions by virtue of executing no more than one thread.
+
+The task set \tasks{} provided by the system designer to
+schedulability analysis is referred to as the task set
+\emph{specification}. Commonly~\cite{Baruah:1990,Liu:1973,Baruah:2005,Bertogna:2011,Burns:1995,Buttazzo:2011}, task set specifications are immutable
+in hard-real time models. The number of tasks, their
+WCET time, period, and deadline are provided by the system
+designer, not to be changed. Schedulability analysis determines if
+the task set specification is feasible. In this work, task sets are
+transformable (obeying some restrictions).
+
+Transformation of a task set exploits the concavity of execution
+requirements, redistributing the threads of individual tasks to
+multiple tasks. A greater number of threads per job reduces the WCET
+of a task but increases the non-preemptive execution
+requirement. Conversely, a fewer number of threads per task increases
+the total WCET for all tasks while decreasing the non-preemptive
+execution requirement. Schedulability analysis in this non-preemptive
+setting  encompasses the search for a distribution of the fixed number
+threads from the task set specification to a variable number of tasks,
+resolving the tension between a greater number of tasks and a
+greater number of threads per task to find a feasible task set. 
+ 
+Under the proposed model, schedulability analysis is a process that
+begins by considering the current task set named the \emph{anterior}
+task set \supts{}. If the set is schedulable, the set is unmodified and
+processing ceases with a positive result. If the task set \supts{}
+cannot be scheduled as described, the task set is transformed into a
+\emph{posterior} task set \tasks{}, and processed again as an anterior
+set. Processing ceases with a negative result when there are no
+available transformations of \supts{}.
+
+Figure~\ref{fig:process} illustrates the schedulability analysis
+process. Division is the transformative operation of the process and
+is described in Subsection~\ref{sec:dividing}. The figure highlights the
+ability of a single task set to be both anterior and posterior to
+different sets during processing. To aid in explanation, properties of a
+task may be referred to in terms of the set the task was transformed
+from and to. By example, if the number of threads assigned to \task{i}
+in the anterior set \supts{} is reduced by one in the posterior task
+set \tasks{}, the posterior threads of \task{i} may be written as
+${m_i = \hat{m}_i - 1}$.
+
+As a process, schedulability analysis of the specified task set serves
+two purposes under this model. The first, is to determine if there exists a
+posterior task set which is feasible. Second, to produce the feasible
+posterior task set if one exists. It is the feasible posterior task
+set \tasks{} found by schedulability analysis that is then
+deployed on the target architecture. From the system designer's
+perspective, each task ${\task{i} \in \tasks{}}$ of the specified
+task set is a request to execute ${m_i}$ threads of the object ${o_i}$
+with shared periods ${p_i}$ and deadlines ${d_i}$ for \textbf{any}
+posterior task set \tasks{}. A task set specification is flexible,
+for one object there may be multiple tasks with variable numbers of
+threads per job. However, the specified ${m_i}$ of a task is a ceiling
+on any ${m_i}$ of a posterior task. 
+
+\subsection{Dividing and Task Parts}
+\label{sec:dividing}
+
+A task set may be transformed by \emph{dividing} tasks of the set.
+Dividing a task reduces the number of threads executed by each
+job, splitting the anterior task into two or more tasks in the
+posterior set. 
+
+\begin{definition}[Task Division]
+\label{def:restrict-division}
+In the anterior task set \supts{}, a task
+${\task{i} = (\period{i}, \deadline{i}, \wcet{i}{\taskthreads{i}})}$
+may be \emph{divided} into two (or more) posterior tasks \task{j} and
+\task{k} with three restrictions: 1.) the periods of \task{j} and
+\task{k} are equal to the period of \task{i} 2.) the relative
+deadlines of \task{j} and \task{k} are equal to the deadline of
+\task{i} 3.) the sum of threads of \task{j} and \task{k} are equal to
+\task{i} 4.) the objects of \task{i}, \task{j}, and \task{k} are
+equal. Enumerated, the restrictions are: 
+
+\begin{tabular}{m{5cm} m{5cm}}
+  \begin{enumerate}
+    \item{\period{i} = \period{j} = \period{k}}
+    \item{\deadline{i} = \deadline{j} = \period{k}}
+  \end{enumerate} &
+  \begin{enumerate}
+    \setcounter{enumi}{2}
+    \item{\taskthreads{i} = \taskthreads{j} + \taskthreads{k}}
+    \item{\object{i} = \object{j} = \object{k}}
+  \end{enumerate}
+\end{tabular}
+\end{definition}
+
+\begin{definition}[Partial Tasks]
+\label{def:partial-tasks}
+When an anterior task \task{i} is divided into \task{j} and \task{k}
+posterior tasks, \task{j} and \task{k} are referred to as
+\emph{partial tasks} or \emph{parts} of \task{i}.
+\end{definition}
+
+\begin{definition}[Partial Task Set]
+  \label{def:partial-task-set}
+  For convenience, the set of posterior tasks of \task{i} is denoted
+  \Partial{i} and called the \emph{partial task set} of \task{i}, 
+  where ${m_i = \sum_{\task{k} \in \Partial{i}} m_k}$.
+\end{definition}
+
+\subsection{Worst-Case Execution Time Function Growth}
+\label{sec:discrete-growth}
+
+Motivation for the task model and schedulability analysis process
+proposed in this work stems from the inter-thread cache benefit of
+\texttt{BUNDLE}-based scheduling~\cite{Tessler:2016,
+  Tessler:2018}. The previous works~\cite{Tessler:2016, Tessler:2018}
+are limited to a single task; this work extends the method
+(non-preemptively) to multiple tasks. Schedulability analysis for
+\texttt{BUNDLE}-based scheduling algorithms produce, for each task
+\task{i}, a worst-case execution time combined with cache overhead
+(WCETO) function ${c_i(m)}$ in terms of ${m}$ the number of threads
+per job scheduled in a cache-cognizant manner. For tasks that benefit
+from \texttt{BUNDLE}-based scheduling and analysis, ${c_i(m)}$ is a
+strictly increasing discrete concave function. Tasks that do not are
+made vacuously concave by restricting jobs to release one thread.
+
+In the WCETO analysis of \bundle{} and \bundlep{}, threads are
+assigned to paths through the conflict-free region graph of the
+executable object which maximize their contribution to
+${c_i(m_i)}$ . When considering the addition of a thread ${m_i + 1}$,
+only the greatest increase in ${c_i(m_i)}$ is permitted. Subsequently,
+the addition of thread ${m_i + 2}$ must increase ${c_i(m_i)}$ by less
+than or equal to the increase from ${m_i + 1}$ or the increase of
+${m_i + 1}$ would not have been maximal. Therefore, for any ${m_a <
+  m_b < m_c}$ the point ${(m_b, c_i(m_b))}$ lies above the straight line
+described by ${(m_a, c_i(m_a))}$ and ${(m_c, c_i(m_c))}$ --
+subsequently, ${c_i(m_i)}$ is concave.
+
+A consequence of ${c_i(m)}$'s strictly increasing discrete
+concavity is a limit on the increase of the WCET as the number of
+threads increases. This property is referred to as the
+\emph{concave restricted growth} (\emph{concave growth} for brevity) of
+${c_i(m)}$ and is leveraged in Sections~\ref{sec:schedulability} and
+\ref{sec:eval}. 
+
+\begin{prop}[Concavity Restriction on WCET Growth]
+  \label{prop:ni-growth}
+  For a strictly increasing discrete
+  concave WCET function ${c_i(m)}$:
+  \label{prop:wcet-growth}
+  \begin{equation}
+    \label{eq:wcet-growth}
+    \indent
+    \forall m \in \mathbb{N}^+~|~c_i(m) - c_i(m - 1) \ge c_i(m + 1) - c_i(m)
+  \end{equation}
+  It then follows for ${m_x \ge m_y > 0}$
+  \begin{align*}
+    \indent
+    c_i(m_x + 1) - c_i(m_x) &\le c_i(m_x) - c_i(m_x - 1) \\
+    &\le c_i(m_x - 1) - c_i(m_x - 2) \\
+    &... \\
+    &\le c_i(m_y) - c_i(m_y + 1) \\
+    &\le c_i(m_y) - c_i(m_y - 1)
+  \end{align*}
+\end{prop}
 
 
-\input{20-model/00-model.tex}
+A WCET function ${c_i(m)}$ that obeys Property~\ref{prop:wcet-growth},
+will produce a value for ${c_i(m+1)}$ threads which is greater than
+${c_i(m)}$. The difference between ${c_i(m+1)}$ and ${c_i(m)}$ must be less
+than or equal to the difference of ${c_i(m)}$ and ${c_i(m-1)}$. As the
+number of threads increase, ${c_i(m)}$ increases at a decreasing (or
+stable) rate. 
+
+For the purposes of comparison and evaluation in
+Section~\ref{sec:eval}, an upper bound on the growth of ${c_i(m)}$
+is called the \emph{growth factor} ${\GFactor_i{}}$ of \task{i}. 
+Growth factors relate the WCET of one thread ${c_i(1)}$ to 
+the WCET of an arbitrary number of threads ${c_i(m)}$ for ${m > 0}$.
+A growth factor ${\GFactor_i{} \in (0,1]}$, for a task \task{i}, is a
+real number that satisfies Equation~\ref{eq:gfactor-condition}.  
+
+\begin{definition}[Growth Factor for \task{i}]
+  \begin{equation}
+    \label{eq:gfactor-condition}
+    \forall{m}~|~ c_i(m) \le c_i(1) + (m - 1) \cdot \GFactor{} \cdot c_i(1)
+  \end{equation}
+\end{definition}
+
+For an \GFactor{} satisfying Equation~\ref{eq:gfactor-condition}, the
+pessimistic upper bound provides a linear function that can be
+rearranged to find an upper bound on the WCET of one thread in terms
+of ${m}$ threads. 
+The result is Equation~\ref{eq:gfactor-eval}, which will be
+used in the evaluation Section~\ref{sec:eval} when constructing
+task sets. Note, since ${m \in \mathbb{N}}$ each increase of ${m}$ 
+increases ${c_i(m)}$ by ${\GFactor{} \cdot c_i(1)}$.
+\begin{equation}
+  \label{eq:gfactor-eval}
+  c_i(m) = c_i(1) + (m - 1) \cdot \GFactor{} \cdot c_i(1)
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Non-Preemptive Schedulability
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
 \input{30-schedulability/00-schedulability.tex}
+
+% end current
+
+
 \input{70-evaluation/00-evaluation.tex}
 \input{75-conclusion/00-conclusion.tex}
 
