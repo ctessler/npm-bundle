@@ -1,4 +1,4 @@
-.PHONY: all 80-appendix
+.PHONY: all
 BASE=main
 TOP=$(BASE).pdf
 
@@ -22,7 +22,7 @@ endef
 all: $(TOP)
 
 $(TOP): export TEXINPUTS=../lipics-v2019-authors:
-$(TOP): $(BASE).tex $(BIBS) 80-appendix | $(TMP) plot # Order only target
+$(TOP): $(BASE).tex $(BIBS) | $(TMP) plot # Order only target
 	$(PDFLATEX) -output-directory=$(TMP) ./$<
 	TEXMFOUTPUT="$(TMP):" bibtex $(TMP)/$(BASE)
 	$(PDFLATEX) -output-directory=$(TMP) ./$<
@@ -32,12 +32,8 @@ $(TOP): $(BASE).tex $(BIBS) 80-appendix | $(TMP) plot # Order only target
 plot:
 	$(error $(PLOTERROR))
 
-80-appendix: | plot
-	$(MAKE) -C $@ $(opt)
-
 $(TMP):
 	mkdir -p $@
 
 clean:
-	$(MAKE) -C 80-appendix clean
 	-rm -rf *.bbl $(TOP) $(TMP)
