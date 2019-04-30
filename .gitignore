@@ -1,2 +1,4 @@
 aux
 *.pdf
+*.log
+*.tar.gz

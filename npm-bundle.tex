@@ -10,11 +10,10 @@
 %for enabling cleveref support, use "autoref"
 
 %helpful if your graphic files are in another directory
+\usepackage{graphicx}
 \graphicspath{
   {./svg/}
-  {./plot/UFS-alg/}
-  {./plot/2D-UFS/}
-  {./plot/avg-alg-sched/}
+  {./plot/}
   {./aux}
 }
 
@@ -1804,12 +1803,12 @@ values are zero.
 \begin{figure}[h]
   \centering
   \begin{subfigure}{\cwidth}
-    \includegraphics[width=\linewidth]{plot/cs-ratio/cs-ratio}
+    \includegraphics[width=\linewidth]{cs-ratio}
     \caption{\texttt{BUNDLEP} Case Study}
     \label{fig:cs-ratio}
   \end{subfigure}%
   \begin{subfigure}{\cwidth}
-    \includegraphics[width=\linewidth]{plot/avg-alg-sched/avg-ratio-TPJ-i}
+    \includegraphics[width=\linewidth]{avg-ratio-TPJ-i}
     \caption{EDF-TPJ Summary}
     \label{fig:avg-ratio-TPJ-i}
   \end{subfigure}
@@ -1835,12 +1834,12 @@ schedulability.
 \begin{figure}[hb]
   \centering
   \begin{subfigure}{\cwidth}
-    \includegraphics[width=\linewidth]{plot/avg-alg-sched/avg-ratio-NP-1}
+    \includegraphics[width=\linewidth]{avg-ratio-NP-1}
     \caption{EDF-NP:1 Summary}
     \label{fig:avg-ratio-NP-1}
   \end{subfigure}%
   \begin{subfigure}{\cwidth}
-    \includegraphics[width=\linewidth]{plot/avg-alg-sched/avg-ratio-NP-m}
+    \includegraphics[width=\linewidth]{avg-ratio-NP-m}
     \caption{EDF-NP:M Summary}
   \label{fig:avg-ratio-NP-m}
   \end{subfigure}
@@ -1904,12 +1903,12 @@ schedule non-preemptively.
 \begin{figure}[ht]
   \centering
   \begin{subfigure}{\cwidth}
-    \includegraphics[width=\linewidth]{plot/2D-UFS/2D-M010m04F0_5xS}%
+    \includegraphics[width=\linewidth]{2D-M010m04F0_5xS}%
     \caption{${(M,m,U,\GFactor{}) = (10,4,*,0.5)}$}
     \label{fig:M10F.5}
   \end{subfigure}%
   \begin{subfigure}{\cwidth}
-    \includegraphics[width=\linewidth]{plot/2D-UFS/2D-M007m03U0_5xS.pdf}%
+    \includegraphics[width=\linewidth]{2D-M007m03U0_5xS.pdf}%
     \caption{${(M,m,U,\GFactor{}) = (7,3,0.5,*)}$}
     \label{fig:M10U.5}
   \end{subfigure}%
@@ -1918,16 +1917,16 @@ schedule non-preemptively.
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=\cwidth]{plot/2D-UFS/2D-M025m08U0_7xS}\quad
-  \includegraphics[width=\cwidth]{plot/2D-UFS/2D-M025m08F0_9xS}%
+  \includegraphics[width=\cwidth]{2D-M025m08U0_7xS}\quad
+  \includegraphics[width=\cwidth]{2D-M025m08F0_9xS}%
   \caption{${M > 10}$ EDF-TPJ Performance Above EDF-P:1}
   \label{fig:m25-tpj}
 \end{figure}
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=\cwidth]{plot/2D-UFS/2D-M100m32F0_4xS}\quad
-  \includegraphics[width=\cwidth]{plot/2D-UFS/2D-M100m32U0_5xS}%
+  \includegraphics[width=\cwidth]{2D-M100m32F0_4xS}\quad
+  \includegraphics[width=\cwidth]{2D-M100m32U0_5xS}%
   \caption{${M = 100}$ EDF-TPJ Performance}
   \label{fig:m100-tpj}
 \end{figure}

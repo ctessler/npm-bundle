@@ -9,6 +9,7 @@ VER=$(shell git rev-parse --short HEAD)
 TMP=aux
 PDFLATEX=pdflatex -halt-on-error -shell-escape -output-format=pdf \
     -interaction=nonstopmode -output-directory=$(TMP)
+PDFLATEX=pdflatex 
 
 all: $(TOP)
 
