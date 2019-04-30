@@ -30,7 +30,7 @@ $(TMP):
 	mkdir -p $@
 
 clean: opt=clean
-clean: svg tex
+clean: svg
 clean:
 	-rm -f $(BASE)*.pdf
 
