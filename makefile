@@ -16,8 +16,6 @@ $(TOP): export TEXINPUTS=lipics-v2019-authors:
 $(TOP): $(BASE).tex $(BIBS) svg | $(TMP) plot # Order only target
 	$(PDFLATEX) -output-directory=$(TMP) ./$<
 	TEXMFOUTPUT="$(TMP):" bibtex $(TMP)/$(BASE)
-	$(PDFLATEX) -output-directory=$(TMP) ./$<
-	$(PDFLATEX) -output-directory=$(TMP) ./$<
 	cp $(TMP)/$(TOP) .
 	cp $(TOP) $(TOP:.pdf=-$(VER).pdf)
 	-echo -e "Current Revision:\n$(VER)"
@@ -34,4 +32,7 @@ clean: svg
 clean:
 	-rm -f $(BASE)*.pdf
 
-export: clean
+export: svg $(TOP)
+	tar cvzf npm-bundle.tar.gz --transform 's,^,npm-bundle/,' \
+	    lipics-v2019-authors plot svg/*.pdf npm-bundle.tex \
+	    npm-bundle.bib $(TOP)
