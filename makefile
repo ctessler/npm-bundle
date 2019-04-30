@@ -32,6 +32,7 @@ clean: opt=clean
 clean: svg
 clean:
 	-rm -f $(BASE)*.pdf
+	-rm -f npm-bundle.log npm-bundle.tar.gz
 
 export: svg $(TOP)
 	tar cvzf npm-bundle.tar.gz --transform 's,^,npm-bundle/,' \
