@@ -1,0 +1,212 @@
+\documentclass[a4paper,USenglish,english]{darts-v2018}
+%This is a template for producing DARTS artifact descriptions. 
+%for A4 paper format use option "a4paper", for US-letter use option "letterpaper"
+%for british hyphenation rules use option "UKenglish", for american hyphenation rules use option "USenglish"
+% for section-numbered lemmas etc., use "numberwithinsect"
+ 
+\usepackage{microtype}%if unwanted, comment out or use option "draft"
+
+%\graphicspath{{./graphics/}}%helpful if your graphic files are in another directory
+
+%\nolinenumbers to disable line numbers
+
+\bibliographystyle{plainurl}% the recommended bibstyle
+
+% Commands for artifact descriptions
+% Written by Camil Demetrescu and Erik Ernst
+% April 8, 2014
+
+\newenvironment{scope}{\section{Scope}}{}
+\newenvironment{content}{\section{Content}}{}
+\newenvironment{getting}{\section{Getting the artifact} The artifact 
+endorsed by the Artifact Evaluation Committee is available free of 
+charge on the Dagstuhl Research Online Publication Server (DROPS).}{}
+\newenvironment{platforms}{\section{Tested platforms}}{}
+\newcommand{\license}[1]{{\section{License}#1}}
+\newcommand{\mdsum}[1]{{\section{MD5 sum of the artifact}#1}}
+\newcommand{\artifactsize}[1]{{\section{Size of the artifact}#1}}
+
+\newcommand{\orcid}[1]{\url{http://orcid.org/#1}}
+\newcommand{\email}[1]{\href{mailto:#1}{\texttt{#1}}}
+
+% Author macros::begin %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{\texttt{NPM-BUNDLE}: Non-Preemptive Multitask Scheduling for
+  Jobs with \texttt{BUNDLE}-based Thread-Level Scheduling (Artifact)}
+
+%optional, in case that the title is too long; the running title
+%should fit into the top page column
+\titlerunning{\texttt{NPM-BUNDLE} (Artifact)}
+
+% ARTIFACT: Authors may not be exactly the same as the related
+% scholarly paper, e.g., you may want to include authors who
+% contributed to the preparation of the artifact, but not to the
+% companion paper 
+
+\author{Corey Tessler}{
+  Wayne State University,
+  {Detroit, Michigan, United States}
+}{corey.tessler@wayne.edu}{}{}
+%mandatory please use full name; only 1 author per \author macro; first two
+%parameters are mandatory, other parameters can be empty. 
+
+\author{Nathan Fisher}{
+  Wayne State Univeristy, {Detroit, Michigan, United States}
+}{fishern@wayne.edu}{}{}
+
+\authorrunning{C. Tessler and N. Fisher}
+%mandatory. First: Use abbreviated first/middle names. Second (only in
+%severe cases): Use first author plus 'et. al.' 
+
+\Copyright{Corey Tessler and Nathan Fisher}
+%mandatory, please use full first names. DARTS license for the
+%artifact description is "CC-BY"; %http://creativecommons.org/licenses/by/3.0/ 
+
+\subjclass{
+  \ccsdesc{Computer systems organization~Real-time systems}
+  \ccsdesc{Software and its engineering~Real-time schedulability}
+}
+% mandatory: Please choose ACM 2012 classifications from
+% https://www.acm.org/publications/class-2012 or
+% https://dl.acm.org/ccs/ccs_flat.cfm . E.g., cite as "General and
+% reference $\rightarrow$ General literature" or \ccsdesc[100]{General
+% and reference~General literature}.  
+
+\keywords{  
+  Scheduling algorithms, Cache Memory, Multi-threading,
+  Static Analysis
+}% mandatory: Please provide 1-5 keywords
+% Author macros::end %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Please provide information to the related scholarly information
+\RelatedArticle{Corey Tessler and Nathan Fisher,
+  ``\texttt{NPM-BUNDLE}: Non-Preemptive Multitask Scheduling for Jobs
+  with \texttt{BUNDLE}-based Thread-Level Scheduling'',
+  in Proceedings of the 31st Euromicro Conference on Real-Time Systems (ECRTS’19).}
+
+%Editor-only macros:: begin (do not touch as author)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\Volume{3}
+\Issue{2}
+\Article{1}
+\RelatedConference{42nd Conference on Very Important Topics (CVIT 2016), December 24--27, 2016, Little Whinging, United Kingdom}
+% Editor-only macros::end %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\newcommand{\bundlep}{\texttt{BUNDLEP}}
+\newcommand{\bundle}{\texttt{BUNDLE}}
+\newcommand{\npmbundle}{\texttt{NPM-BUNDLE}}
+\newcommand{\tpj}{\text{\sc{tpj}}}
+
+\maketitle
+
+\begin{abstract}
+  The \bundle{} and \bundlep{} scheduling algorithms are cache-cognizant
+  thread-level scheduling algorithms and associated worst case
+  execution time and cache overhead (WCETO) techniques for hard
+  real-time multi-threaded tasks. The \texttt{BUNDLE}-based approaches
+  utilize the inter-thread cache benefit to reduce WCETO values for 
+  jobs. Currently, the \texttt{BUNDLE}-based approaches are limited to
+  scheduling a single task. This work aims to expand the applicability
+  of \texttt{BUNDLE}-based scheduling to multiple task multi-threaded
+  task sets.
+
+  \texttt{BUNDLE}-based scheduling leverages knowledge of potential
+  cache conflicts to selectively preempt one thread in favor of
+  another from the same job. This thread-level preemption is a
+  requirement for the run-time behavior and WCETO calculation to
+  receive the benefit of \texttt{BUNDLE}-based approaches. This work
+  proposes scheduling \texttt{BUNDLE}-based jobs non-preemptively
+  according to the earliest deadline first (EDF) policy. Jobs are
+  forbidden from preempting one another, while threads within a job
+  are allowed to preempt other threads.
+
+  An accompanying schedulability test is provided, named Threads Per
+  Job (\tpj{}). \tpj{} is a novel schedulability test, input is a task
+  set specification which may be transformed (under certain
+  restrictions); dividing threads among tasks in an effort to find
+  a feasible task set. Enhanced by the flexibility to transform task
+  sets and taking advantage of the inter-thread cache benefit, the
+  evaluation shows \tpj{} scheduling task sets fully preemptive EDF
+  cannot. 
+\end{abstract}
+
+% ARTIFACT: please stick to the structure of 7 sections provided below
+
+% ARTIFACT: section on the scope of the artifact (what claims of the
+% paper are intended to be backed by this artifact?) 
+\begin{scope}
+  The artifacts for non-preemptive multi-task \bundle{} (\npmbundle{})
+allow an independent party to recreate and expand upon the results
+presented in the research. The primary focus is reproduction of the
+ten graphs that summarize the schedulability ratios of preemptive EDF,
+non-preemptive EDF, and the proposed Threads Per Job (\tpj{})
+algorithms.
+
+  Data for the graphs is supplied by the creation and analysis of
+synthetic task sets. Synthetic task sets and their analysis depend on
+two components 1.) the libsched library 2.) a framework utilizing
+libsched. Both of these components are pre-built and configured in the
+supplied virtual machine of the artifact.
+
+  The virtual machine image and accompanying instructions provide
+direction for reproducing the results presented in the research, as
+well as additional results and methods for tailoring the data set size
+and parameters to suit subsequent research.
+
+\end{scope}
+
+% ARTIFACT: section on the contents of the artifact (code, data, etc.)
+\begin{content}
+When the artifact package is expanded, it includes:
+\begin{itemize}
+\item \texttt{NPM-BUNDLE-01.zip}: A virtual machine image compatible
+  with Virtual Box.
+\item \texttt{NPM-BUNDLE-artifact-eval.pdf}: A document describing the
+  use of the environment present on the virtual machine to generate
+  synthetic tasks and analyze their results. Additionally, this
+  document provides instructions on 1.) how to acquire and install the
+  libsched library 2.) modify parameters of data generation used by
+  the framework.
+\end{itemize}
+\end{content}
+
+% ARTIFACT: section containing links to sites holding the
+% latest version of the code/data, if any
+\begin{getting}
+% leave empty if the artifact is only available on the DROPS server.
+% otherwise, provide links to the latest version of the artifact (e.g., on github)
+  In addition, the artifact is also available as \texttt{artifact.tgz}
+  at:
+  \begin{itemize}
+    \item Long URL: \url{https://waynestateprod-my.sharepoint.com/:f:/g/personal/fh3227\_wayne\_edu/EprJwQXLTvBFo6n5XGh5-PUBBIL87kMSCfwKUTH8vlyx4w?e=Fcp1yY} 
+    \item Short URL: \url{https://bit.ly/2VwM3eF}
+  \end{itemize}
+\end{getting}
+
+% ARTIFACT: section specifying the platforms on which the artifact is known to
+% work, including requirements beyond the operating system such as large
+% amounts of memory or many processor cores
+\begin{platforms}
+  The virtual machine is known to operate correctly on a host system
+  with an Intel(R) Core i5-4690K at 3.50 GHz with 16 gigabytes of
+  memory. Two cores and one gigabyte of memory was dedicated to the
+  virtual machine guest. With these resources the results are generated in the
+  range of ${[2, 72]}$ hours. The variance is due to the nature of synthetic task
+  parameters being generated by pseudo-random algorithms.
+\end{platforms}
+
+% ARTIFACT: section specifying the license under which the artifact is
+% made available
+\license{The artifact is available under license Creative Commons CC-BY.}
+
+% ARTIFACT: section specifying the md5 sum of the artifact master file
+% uploaded to the Dagstuhl Research Online Publication Server, enabling 
+% downloaders to check that the file is the expected version and suffered 
+% no damage during download.
+\mdsum{9b89f75e677bd37728faac2b920ae240}
+
+% ARTIFACT: section specifying the size of the artifact master file uploaded
+% to the Dagstuhl Research Online Publication Server
+\artifactsize{5.4 GiB}
+
+\end{document}
